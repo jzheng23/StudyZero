@@ -9,18 +9,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,17 +31,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.R.drawable.tw_bg
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 
 @Composable
-fun ShowEsm(modifier: Modifier = Modifier) {
+fun ShowEsm(
+    isPreview: Boolean,
+    modifier: Modifier = Modifier,
+    myViewModel: EsmViewModel = viewModel()
+) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
-    val activity = (LocalContext.current as Activity)
+    val activity = if (isPreview) null else (LocalContext.current as Activity)
     Box {
         Image(
             painter = painterResource(id = tw_bg),
@@ -50,7 +56,7 @@ fun ShowEsm(modifier: Modifier = Modifier) {
         )
         Dialog(
             onDismissRequest = {
-                activity.finish()
+                activity?.finish()
             },
             properties = DialogProperties(
                 dismissOnBackPress = true,
@@ -79,8 +85,8 @@ fun ShowEsm(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
                     )
-                    ShowQuestion(R.string.question1)
-                    ShowQuestion(R.string.question2)
+                    ShowQuestion(R.string.question1, onSelectionChanged = {myViewModel.setSelection1(it)})
+                    ShowQuestion(R.string.question2, onSelectionChanged = {myViewModel.setSelection2(it)})
                     //Submit()
                     Button(
                         modifier = Modifier
@@ -89,7 +95,7 @@ fun ShowEsm(modifier: Modifier = Modifier) {
                                 horizontal = dimensionResource(id = R.dimen.padding_medium),
                                 vertical = dimensionResource(id = R.dimen.padding_medium) / 2
                             ),
-                        onClick = {activity.finish()}) {
+                        onClick = {activity?.finish()}) {
                         Text(
                             stringResource(R.string.submit),
                             style = MaterialTheme.typography.headlineSmall
@@ -99,44 +105,26 @@ fun ShowEsm(modifier: Modifier = Modifier) {
             }
         }
     }
-
-}
-/*
-@Composable
-fun Submit() {
-    val activity = (LocalContext.current as Activity)
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.padding_medium),
-                vertical = dimensionResource(id = R.dimen.padding_medium) / 2
-            ),
-        onClick = {activity.finish()}) {
-        Text(
-            stringResource(R.string.submit),
-            style = MaterialTheme.typography.headlineSmall
-        )
-    }
 }
 
- */
-
 @Composable
-fun ShowQuestion(questionStringID: Int, modifier: Modifier = Modifier) {
+fun ShowQuestion(
+    questionStringID: Int,
+    modifier: Modifier = Modifier,
+    onSelectionChanged: (Int) -> Unit = {}
+    ) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
-    var sliderPosition by remember { mutableStateOf(1f) }
     Card(
         //elevation = CardElevation() ,
         modifier = modifier
             .fillMaxWidth()
             //.wrapContentHeight()
-            .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
+            .padding(horizontal = mediumPadding, vertical = mediumPadding / 3)
         ,
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id =  R.dimen.elevation))
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally ,
             modifier = modifier
                 .background(color = MaterialTheme.colorScheme.surfaceVariant)
                 .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
@@ -145,23 +133,11 @@ fun ShowQuestion(questionStringID: Int, modifier: Modifier = Modifier) {
                 stringResource(id = questionStringID),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
-            Slider(
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it },
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.primary,
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                    activeTickColor = MaterialTheme.colorScheme.primary,
-                    inactiveTickColor = MaterialTheme.colorScheme.primary
-                ),
-                steps = 3,
-                valueRange = 1f..5f
-            )
+            LikertButtons(onSelectionChanged = onSelectionChanged)
             Row (
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ){
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -187,7 +163,7 @@ fun ShowQuestion(questionStringID: Int, modifier: Modifier = Modifier) {
 fun TextLabel (text: String){
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge,
+        style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
@@ -196,7 +172,7 @@ fun TextLabel (text: String){
 @Composable
 fun GreetingPreview() {
     StudyZeroTheme {
-        ShowEsm()
+        ShowEsm(isPreview = true)
     }
 }
 
@@ -204,6 +180,34 @@ fun GreetingPreview() {
 @Composable
 fun GreetingPreviewDark() {
     StudyZeroTheme(darkTheme = true) {
-        ShowEsm()
+        ShowEsm(isPreview = true)
+    }
+}
+
+@Composable
+fun LikertButtons(
+    modifier: Modifier = Modifier,
+    onSelectionChanged: (Int) -> Unit = {},
+){
+    val options: List<Int> = listOf(1,2,3,4,5)
+    var selectedValue by rememberSaveable { mutableStateOf(0) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .height(28.dp)
+            .fillMaxWidth()
+            .padding(top = dimensionResource(id = R.dimen.padding_medium))
+        ) {
+        options.forEach { item ->
+            RadioButton(
+                selected = selectedValue == item,
+                onClick = {
+                    selectedValue = item
+                    onSelectionChanged(item)
+                }
+            )
+        }
     }
 }
