@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -25,13 +27,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,12 +84,25 @@ fun ShowEsm(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = modifier
                         .background(color = MaterialTheme.colorScheme.surface)
+                        .padding( vertical = mediumPadding)
                 ) {
                     Text(
                         stringResource(R.string.instruction),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface,
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                lineHeight = 1.0.em,
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                ),
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.None
+                                )
+                            )
+                        ),
                         modifier = Modifier
                             .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
                     )
@@ -119,7 +140,7 @@ fun ShowQuestion(
         modifier = modifier
             .fillMaxWidth()
             //.wrapContentHeight()
-            .padding(horizontal = mediumPadding, vertical = mediumPadding / 3)
+            .padding(horizontal = mediumPadding, vertical = mediumPadding)
         ,
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id =  R.dimen.elevation))
     ) {
@@ -127,34 +148,27 @@ fun ShowQuestion(
             horizontalAlignment = Alignment.CenterHorizontally ,
             modifier = modifier
                 .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
+                .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
         ) {
             Text(
                 stringResource(id = questionStringID),
                 textAlign = TextAlign.Center,
+                fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                style = LocalTextStyle.current.merge(
+                    TextStyle(
+                        lineHeight = 1.0.em,
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        ),
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Center,
+                            trim = LineHeightStyle.Trim.None
+                        )
+                    )
+                ),
             )
             LikertButtons(onSelectionChanged = onSelectionChanged)
-            Row (
-                verticalAlignment = Alignment.Top
-            ){
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    TextLabel("strongly")
-                    TextLabel("disagree")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                TextLabel("neutral")
-                Spacer(modifier = Modifier.weight(1f))
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    TextLabel("strongly")
-                    TextLabel("agree")
-                }
-            }
         }
     }
 }
@@ -190,24 +204,49 @@ fun LikertButtons(
     onSelectionChanged: (Int) -> Unit = {},
 ){
     val options: List<Int> = listOf(1,2,3,4,5)
+    val labels: List<String> = listOf("strongly disagree","","neutral","","strongly agree")
     var selectedValue by rememberSaveable { mutableStateOf(0) }
 
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
-            .height(28.dp)
+            //.height(28.dp)
             .fillMaxWidth()
             .padding(top = dimensionResource(id = R.dimen.padding_medium))
         ) {
         options.forEach { item ->
-            RadioButton(
-                selected = selectedValue == item,
-                onClick = {
-                    selectedValue = item
-                    onSelectionChanged(item)
-                }
-            )
+            Column {
+                RadioButton(
+                    selected = selectedValue == item,
+                    onClick = {
+                        selectedValue = item
+                        onSelectionChanged(item)
+                    },
+                    modifier = modifier
+                        .height(22.dp)
+                )
+                Text(
+                    text = labels[item - 1],
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center ,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            lineHeight = 1.0.em,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                    modifier = modifier
+                        .width(55.dp)
+
+                )
+            }
         }
     }
 }
