@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -116,7 +114,7 @@ fun ShowEsm(
                                 horizontal = dimensionResource(id = R.dimen.padding_medium),
                                 vertical = dimensionResource(id = R.dimen.padding_medium) / 2
                             ),
-                        onClick = {activity?.finish()}) {
+                        onClick = {activity?.moveTaskToBack(true)}) {
                         Text(
                             stringResource(R.string.submit),
                             style = MaterialTheme.typography.headlineSmall
@@ -173,14 +171,6 @@ fun ShowQuestion(
     }
 }
 
-@Composable
-fun TextLabel (text: String){
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -190,7 +180,7 @@ fun GreetingPreview() {
     }
 }
 
-//@Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun GreetingPreviewDark() {
     StudyZeroTheme(darkTheme = true) {
