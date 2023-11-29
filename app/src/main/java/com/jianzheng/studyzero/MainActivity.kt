@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
     private val unlockReceiver = UnlockReceiver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("Main","OnCreate")
         setContent {
             StudyZeroTheme {
                 // A surface container using the 'background' color from the theme
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        Log.d("Main","OnResume")
         handleNotification()
     }
     override fun onDestroy() {

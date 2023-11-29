@@ -21,7 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +46,8 @@ import com.jianzheng.studyzero.R.drawable.tw_bg
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 
+
+
 @Composable
 fun ShowEsm(
     isPreview: Boolean,
@@ -54,6 +56,11 @@ fun ShowEsm(
 ) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
     val activity = if (isPreview) null else (LocalContext.current as Activity)
+    var selectedValue1 by remember { mutableStateOf(0) }
+    var selectedValue2 by remember { mutableStateOf(0) }
+    val options: List<Int> = listOf(1,2,3,4,5)
+    val labels: List<String> = listOf("Strongly disagree","","Neutral","","Strongly agree")
+
     Box {
         Image(
             painter = painterResource(id = tw_bg),
@@ -62,6 +69,8 @@ fun ShowEsm(
         )
         Dialog(
             onDismissRequest = {
+                selectedValue1 = 0
+                selectedValue2 = 0
                 activity?.moveTaskToBack(true)
             },
             properties = DialogProperties(
@@ -82,7 +91,7 @@ fun ShowEsm(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = modifier
                         .background(color = MaterialTheme.colorScheme.surface)
-                        .padding( vertical = mediumPadding)
+                        .padding(vertical = mediumPadding)
                 ) {
                     Text(
                         stringResource(R.string.instruction),
@@ -104,8 +113,165 @@ fun ShowEsm(
                         modifier = Modifier
                             .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
                     )
-                    ShowQuestion(R.string.question1, onSelectionChanged = {myViewModel.setSelection1(it)})
-                    ShowQuestion(R.string.question2, onSelectionChanged = {myViewModel.setSelection2(it)})
+//                    ShowQuestion(R.string.question1)
+//                    ShowQuestion(R.string.question2)
+                    //show question 1
+                    Card(
+                        //elevation = CardElevation() ,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            //.wrapContentHeight()
+                            .padding(horizontal = mediumPadding, vertical = mediumPadding)
+                        ,
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id =  R.dimen.elevation))
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally ,
+                            modifier = modifier
+                                .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                                .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
+                        ) {
+                            Text(
+                                stringResource(id = R.string.question1),
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        lineHeight = 1.0.em,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Center,
+                                            trim = LineHeightStyle.Trim.None
+                                        )
+                                    )
+                                ),
+                            )
+                            Row(
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = modifier
+                                    //.height(28.dp)
+                                    .fillMaxWidth()
+                                    .padding(top = dimensionResource(id = R.dimen.padding_medium))
+                            ) {
+                                options.forEach { item ->
+                                    Column {
+                                        RadioButton(
+                                            selected = selectedValue1 == item,
+                                            onClick = {
+                                                selectedValue1 = item
+                                                myViewModel.setSelection1(item)
+                                            },
+                                            modifier = modifier
+                                                .height(22.dp)
+                                        )
+                                        Text(
+                                            text = labels[item - 1],
+                                            fontSize = 12.sp,
+                                            textAlign = TextAlign.Center ,
+                                            style = LocalTextStyle.current.merge(
+                                                TextStyle(
+                                                    lineHeight = 1.0.em,
+                                                    platformStyle = PlatformTextStyle(
+                                                        includeFontPadding = false
+                                                    ),
+                                                    lineHeightStyle = LineHeightStyle(
+                                                        alignment = LineHeightStyle.Alignment.Center,
+                                                        trim = LineHeightStyle.Trim.None
+                                                    )
+                                                )
+                                            ),
+                                            modifier = modifier
+                                                .width(55.dp)
+
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Card(
+                        //elevation = CardElevation() ,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            //.wrapContentHeight()
+                            .padding(horizontal = mediumPadding, vertical = mediumPadding)
+                        ,
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id =  R.dimen.elevation))
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally ,
+                            modifier = modifier
+                                .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                                .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
+                        ) {
+                            Text(
+                                stringResource(id = R.string.question2),
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        lineHeight = 1.0.em,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Center,
+                                            trim = LineHeightStyle.Trim.None
+                                        )
+                                    )
+                                ),
+                            )
+                            Row(
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = modifier
+                                    //.height(28.dp)
+                                    .fillMaxWidth()
+                                    .padding(top = dimensionResource(id = R.dimen.padding_medium))
+                            ) {
+                                options.forEach { item ->
+                                    Column {
+                                        RadioButton(
+                                            selected = selectedValue2 == item,
+                                            onClick = {
+                                                selectedValue2 = item
+                                                myViewModel.setSelection2(item)
+                                            },
+                                            modifier = modifier
+                                                .height(22.dp)
+                                        )
+                                        Text(
+                                            text = labels[item - 1],
+                                            fontSize = 12.sp,
+                                            textAlign = TextAlign.Center ,
+                                            style = LocalTextStyle.current.merge(
+                                                TextStyle(
+                                                    lineHeight = 1.0.em,
+                                                    platformStyle = PlatformTextStyle(
+                                                        includeFontPadding = false
+                                                    ),
+                                                    lineHeightStyle = LineHeightStyle(
+                                                        alignment = LineHeightStyle.Alignment.Center,
+                                                        trim = LineHeightStyle.Trim.None
+                                                    )
+                                                )
+                                            ),
+                                            modifier = modifier
+                                                .width(55.dp)
+
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     //Submit()
                     Button(
                         modifier = Modifier
@@ -114,7 +280,11 @@ fun ShowEsm(
                                 horizontal = dimensionResource(id = R.dimen.padding_medium),
                                 vertical = dimensionResource(id = R.dimen.padding_medium) / 2
                             ),
-                        onClick = {activity?.moveTaskToBack(true)}) {
+                        onClick = {
+                            selectedValue1 = 0
+                            selectedValue2 = 0
+                            activity?.moveTaskToBack(true)
+                        }) {
                         Text(
                             stringResource(R.string.submit),
                             style = MaterialTheme.typography.headlineSmall
@@ -122,51 +292,6 @@ fun ShowEsm(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ShowQuestion(
-    questionStringID: Int,
-    modifier: Modifier = Modifier,
-    onSelectionChanged: (Int) -> Unit = {}
-    ) {
-    val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
-    Card(
-        //elevation = CardElevation() ,
-        modifier = modifier
-            .fillMaxWidth()
-            //.wrapContentHeight()
-            .padding(horizontal = mediumPadding, vertical = mediumPadding)
-        ,
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id =  R.dimen.elevation))
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally ,
-            modifier = modifier
-                .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
-        ) {
-            Text(
-                stringResource(id = questionStringID),
-                textAlign = TextAlign.Center,
-                fontSize = 15.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        lineHeight = 1.0.em,
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        ),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.None
-                        )
-                    )
-                ),
-            )
-            LikertButtons(onSelectionChanged = onSelectionChanged)
         }
     }
 }
@@ -185,58 +310,5 @@ fun GreetingPreview() {
 fun GreetingPreviewDark() {
     StudyZeroTheme(darkTheme = true) {
         ShowEsm(isPreview = true)
-    }
-}
-
-@Composable
-fun LikertButtons(
-    modifier: Modifier = Modifier,
-    onSelectionChanged: (Int) -> Unit = {},
-){
-    val options: List<Int> = listOf(1,2,3,4,5)
-    val labels: List<String> = listOf("strongly disagree","","neutral","","strongly agree")
-    var selectedValue by rememberSaveable { mutableStateOf(0) }
-
-    Row(
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier
-            //.height(28.dp)
-            .fillMaxWidth()
-            .padding(top = dimensionResource(id = R.dimen.padding_medium))
-        ) {
-        options.forEach { item ->
-            Column {
-                RadioButton(
-                    selected = selectedValue == item,
-                    onClick = {
-                        selectedValue = item
-                        onSelectionChanged(item)
-                    },
-                    modifier = modifier
-                        .height(22.dp)
-                )
-                Text(
-                    text = labels[item - 1],
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center ,
-                    style = LocalTextStyle.current.merge(
-                        TextStyle(
-                            lineHeight = 1.0.em,
-                            platformStyle = PlatformTextStyle(
-                                includeFontPadding = false
-                            ),
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.None
-                            )
-                        )
-                    ),
-                    modifier = modifier
-                        .width(55.dp)
-
-                )
-            }
-        }
     }
 }
