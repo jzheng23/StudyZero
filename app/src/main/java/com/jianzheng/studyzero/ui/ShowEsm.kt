@@ -62,7 +62,7 @@ fun ShowEsm(
         )
         Dialog(
             onDismissRequest = {
-                activity?.finish()
+                activity?.moveTaskToBack(true)
             },
             properties = DialogProperties(
                 dismissOnBackPress = true,

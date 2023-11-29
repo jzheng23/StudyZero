@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
+import androidx.core.app.NotificationManagerCompat
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.ui.ShowEsm
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
@@ -27,8 +28,17 @@ class MainActivity : ComponentActivity() {
         Log.d("UnlockReceiver","MainActivity Started")
     }
 
+    override fun onResume() {
+        super.onResume()
+        handleNotification()
+    }
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(unlockReceiver)
+    }
+
+    private fun handleNotification() {
+        val notificationManager = NotificationManagerCompat.from(this)
+        notificationManager.cancel(1)
     }
 }
