@@ -62,6 +62,19 @@ class TimerService : Service() {
     private fun sendNotification() {
         createNotificationChannel()
 
+        val i = packageManager
+            .getLaunchIntentForPackage(packageName)
+            ?.setPackage(null)
+            ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+
+        val pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_IMMUTABLE)
+/*
+        return NotificationCompat.Builder(context)
+            // ... (other notification settings)
+            .setContentIntent(pendingIntent)
+            .build()
+
+
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -69,6 +82,8 @@ class TimerService : Service() {
             notificationIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
+
+ */
 
         val notification = NotificationCompat.Builder(this, "timer_channel")
             .setContentTitle("Hi")
