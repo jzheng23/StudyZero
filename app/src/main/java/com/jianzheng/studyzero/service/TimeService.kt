@@ -9,15 +9,19 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
+import android.os.SystemClock
+import android.util.Log
 import androidx.core.R.drawable.notification_tile_bg
 import androidx.core.app.NotificationCompat
 import com.jianzheng.studyzero.MainActivity
+import com.jianzheng.studyzero.receiver.UnlockReceiver
 
 class TimerService : Service() {
 
     //private var startTimeMillis: Long = 0
     private lateinit var notificationManager: NotificationManager
     private val notificationId = 1 // Unique ID for the notification
+    private val unlockReceiver = UnlockReceiver()
 
     override fun onCreate() {
         super.onCreate()
@@ -27,7 +31,8 @@ class TimerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Save the start time when the service is started
-        //startTimeMillis = SystemClock.elapsedRealtime()
+        val startTimeMillis = SystemClock.elapsedRealtime()
+        Log.d("Time","Service start at $startTimeMillis")
 
         // Use a Handler to send the notification after 5 seconds
         val handler = Handler()
@@ -36,8 +41,6 @@ class TimerService : Service() {
             stopSelf() // Stop the service after sending the notification
         }, 3000L) // 3 seconds delay
 
-        // Return START_NOT_STICKY to indicate that if the system kills the service,
-        // it doesn't need to be restarted
         return START_NOT_STICKY
     }
 
@@ -68,22 +71,6 @@ class TimerService : Service() {
             ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
 
         val pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_IMMUTABLE)
-/*
-        return NotificationCompat.Builder(context)
-            // ... (other notification settings)
-            .setContentIntent(pendingIntent)
-            .build()
-
-
-        val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
- */
 
         val notification = NotificationCompat.Builder(this, "timer_channel")
             .setContentTitle("Hi")
@@ -96,5 +83,7 @@ class TimerService : Service() {
             .build()
 
         notificationManager.notify(notificationId, notification)
+        val startTimeMillis = SystemClock.elapsedRealtime()
+        Log.d("Time","Notification sent at $startTimeMillis")
     }
 }

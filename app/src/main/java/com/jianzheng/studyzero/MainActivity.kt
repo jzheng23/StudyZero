@@ -3,6 +3,7 @@ package com.jianzheng.studyzero
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,12 +27,13 @@ class MainActivity : ComponentActivity() {
             }
         }
         registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
-        Log.d("UnlockReceiver","MainActivity Started")
+        Log.d("Time","MainActivity Started")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d("Main","OnResume")
+        val startTimeMillis = SystemClock.elapsedRealtime()
+        Log.d("Time","Main activity resumed after ${startTimeMillis - unlockReceiver.startTimeMillis}")
         handleNotification()
     }
     override fun onDestroy() {
