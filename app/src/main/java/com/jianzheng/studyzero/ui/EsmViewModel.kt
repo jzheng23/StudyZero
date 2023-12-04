@@ -33,8 +33,8 @@ class EsmViewModel : ViewModel() {
         return uiState.value.selection2
     }
 
-    fun resetSelections(){
-        Log.d("ViewModel","Reset")
+    fun resetSelections() {
+        Log.d("ViewModel", "Reset")
         _uiState.update { currentState ->
             currentState.copy(selection1 = 0, selection2 = 0)
         }
