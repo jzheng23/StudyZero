@@ -48,203 +48,195 @@ fun ShowEsm(
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
 
-    Card(
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth(),
-        //.wrapContentHeight()
-        //.padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
-        //.background(color = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(vertical = mediumPadding)
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .background(color = MaterialTheme.colorScheme.surface)
-                .padding(vertical = mediumPadding)
-        ) {
-            Text(
-                stringResource(R.string.instruction),
-                textAlign = TextAlign.Center,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        lineHeight = 1.0.em,
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        ),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.None
-                        )
+        Text(
+            stringResource(R.string.instruction),
+            textAlign = TextAlign.Center,
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    lineHeight = 1.0.em,
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Center,
+                        trim = LineHeightStyle.Trim.None
                     )
-                ),
-                modifier = Modifier
-                    .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
-            )
+                )
+            ),
+            modifier = Modifier
+                .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
+        )
 //                    ShowQuestion(R.string.question1)
 //                    ShowQuestion(R.string.question2)
-            //show question 1
-            Card(
-                //elevation = CardElevation() ,
+        //show question 1
+        Card(
+            //elevation = CardElevation() ,
+            modifier = modifier
+                .fillMaxWidth()
+                //.wrapContentHeight()
+                .padding(horizontal = mediumPadding, vertical = mediumPadding),
+            elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
-                    .fillMaxWidth()
-                    //.wrapContentHeight()
-                    .padding(horizontal = mediumPadding, vertical = mediumPadding),
-                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Text(
+                    stringResource(id = R.string.question1),
+                    textAlign = TextAlign.Center,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            lineHeight = 1.0.em,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                )
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = modifier
-                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
+                        //.height(28.dp)
+                        .fillMaxWidth()
+                        .padding(top = dimensionResource(id = R.dimen.padding_medium))
                 ) {
-                    Text(
-                        stringResource(id = R.string.question1),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = LocalTextStyle.current.merge(
-                            TextStyle(
-                                lineHeight = 1.0.em,
-                                platformStyle = PlatformTextStyle(
-                                    includeFontPadding = false
-                                ),
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.None
-                                )
+                    options.forEach { item ->
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )
+                        {
+                            RadioButton(
+                                selected = selectedValue1 == item,
+                                onClick = {
+                                    selectedValue1 = item
+                                    myViewModel.setSelection1(item)
+                                },
+                                modifier = modifier
+                                    .height(22.dp)
                             )
-                        ),
-                    )
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = modifier
-                            //.height(28.dp)
-                            .fillMaxWidth()
-                            .padding(top = dimensionResource(id = R.dimen.padding_medium))
-                    ) {
-                        options.forEach { item ->
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            )
-                            {
-                                RadioButton(
-                                    selected = selectedValue1 == item,
-                                    onClick = {
-                                        selectedValue1 = item
-                                        myViewModel.setSelection1(item)
-                                    },
-                                    modifier = modifier
-                                        .height(22.dp)
-                                )
-                                Text(
-                                    text = labels[item - 1],
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    style = LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            lineHeight = 1.0.em,
-                                            platformStyle = PlatformTextStyle(
-                                                includeFontPadding = false
-                                            ),
-                                            lineHeightStyle = LineHeightStyle(
-                                                alignment = LineHeightStyle.Alignment.Center,
-                                                trim = LineHeightStyle.Trim.None
-                                            )
+                            Text(
+                                text = labels[item - 1],
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        lineHeight = 1.0.em,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Center,
+                                            trim = LineHeightStyle.Trim.None
                                         )
-                                    ),
-                                    modifier = modifier
-                                        .width(55.dp)
+                                    )
+                                ),
+                                modifier = modifier
+                                    .width(55.dp)
 
-                                )
-                            }
+                            )
                         }
                     }
                 }
             }
+        }
 
-            Card(
-                //elevation = CardElevation() ,
+        Card(
+            //elevation = CardElevation() ,
+            modifier = modifier
+                .fillMaxWidth()
+                //.wrapContentHeight()
+                .padding(horizontal = mediumPadding, vertical = mediumPadding),
+            elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
-                    .fillMaxWidth()
-                    //.wrapContentHeight()
-                    .padding(horizontal = mediumPadding, vertical = mediumPadding),
-                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = modifier
-                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(horizontal = mediumPadding, vertical = mediumPadding / 4)
-                ) {
-                    Text(
-                        stringResource(id = R.string.question2),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = LocalTextStyle.current.merge(
-                            TextStyle(
-                                lineHeight = 1.0.em,
-                                platformStyle = PlatformTextStyle(
-                                    includeFontPadding = false
-                                ),
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.None
-                                )
+                Text(
+                    stringResource(id = R.string.question2),
+                    textAlign = TextAlign.Center,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            lineHeight = 1.0.em,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
                             )
-                        ),
-                    )
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = modifier
-                            //.height(28.dp)
-                            .fillMaxWidth()
-                            .padding(top = dimensionResource(id = R.dimen.padding_medium))
-                    ) {
-                        options.forEach { item ->
-                            Column {
-                                RadioButton(
-                                    selected = selectedValue2 == item,
-                                    onClick = {
-                                        selectedValue2 = item
-                                        myViewModel.setSelection2(item)
-                                    },
-                                    modifier = modifier
-                                        .height(22.dp)
-                                )
-                                Text(
-                                    text = labels[item - 1],
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    style = LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            lineHeight = 1.0.em,
-                                            platformStyle = PlatformTextStyle(
-                                                includeFontPadding = false
-                                            ),
-                                            lineHeightStyle = LineHeightStyle(
-                                                alignment = LineHeightStyle.Alignment.Center,
-                                                trim = LineHeightStyle.Trim.None
-                                            )
+                        )
+                    ),
+                )
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = modifier
+                        //.height(28.dp)
+                        .fillMaxWidth()
+                        .padding(top = dimensionResource(id = R.dimen.padding_medium))
+                ) {
+                    options.forEach { item ->
+                        Column {
+                            RadioButton(
+                                selected = selectedValue2 == item,
+                                onClick = {
+                                    selectedValue2 = item
+                                    myViewModel.setSelection2(item)
+                                },
+                                modifier = modifier
+                                    .height(22.dp)
+                            )
+                            Text(
+                                text = labels[item - 1],
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        lineHeight = 1.0.em,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Center,
+                                            trim = LineHeightStyle.Trim.None
                                         )
-                                    ),
-                                    modifier = modifier
-                                        .width(55.dp)
+                                    )
+                                ),
+                                modifier = modifier
+                                    .width(55.dp)
 
-                                )
-                            }
+                            )
                         }
                     }
                 }
             }
+        }
 
-            //Submit()
+        //Submit()
 //            Button(
 //                modifier = Modifier
 //                    .fillMaxWidth()
@@ -262,29 +254,7 @@ fun ShowEsm(
 //                    style = MaterialTheme.typography.headlineSmall
 //                )
 //            }
-        }
     }
-
-//    Box {
-////        Image(
-////            painter = painterResource(id = tw_bg),
-////            contentDescription = null,
-////            contentScale = ContentScale.Fit
-////        )
-////        Dialog(
-////            onDismissRequest = {
-////                selectedValue1 = 0
-////                selectedValue2 = 0
-////                activity?.moveTaskToBack(true)
-////            },
-////            properties = DialogProperties(
-////                dismissOnBackPress = true,
-////                dismissOnClickOutside = true
-////            )
-////        ) {
-////
-////        }
-//    }
 }
 
 
