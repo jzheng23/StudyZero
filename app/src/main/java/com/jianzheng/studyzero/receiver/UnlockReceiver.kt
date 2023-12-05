@@ -13,8 +13,9 @@ class UnlockReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_USER_PRESENT) {
             startTimeMillis = SystemClock.elapsedRealtime()
-            Log.d("Time", "Broadcast received at $startTimeMillis")
+            //Log.d("Time", "Broadcast received at $startTimeMillis")
             val serviceIntent = Intent(context, OverlayService::class.java)
+            serviceIntent.putExtra("unlock", startTimeMillis)
             val handler = Handler()
             handler.postDelayed({
                 context?.startService(serviceIntent)

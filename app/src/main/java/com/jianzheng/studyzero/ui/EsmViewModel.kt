@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.update
 class EsmViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(EsmUiState(selection1 = 0, selection2 = 0))
     val uiState: StateFlow<EsmUiState> = _uiState.asStateFlow()
-
-
     fun setSelection1(selection: Int = 0) {
         _uiState.update { currentState ->
             currentState.copy(selection1 = selection)
@@ -39,4 +37,5 @@ class EsmViewModel : ViewModel() {
             currentState.copy(selection1 = 0, selection2 = 0)
         }
     }
+
 }

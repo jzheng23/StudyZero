@@ -5,7 +5,6 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
@@ -17,7 +16,7 @@ class MainActivity : ComponentActivity() {
     private val unlockReceiver = UnlockReceiver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("Main", "OnCreate")
+        //Log.d("Main", "OnCreate")
         setContent {
             StudyZeroTheme {
                 // A surface container using the 'background' color from the theme
@@ -27,7 +26,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
-        Log.d("Time", "MainActivity Started")
+        //Log.d("Time", "MainActivity Started")
         if (!Settings.canDrawOverlays(this)) {
             //startService(Intent(this, OverlayService::class.java))
             checkOverlayPermission()

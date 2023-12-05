@@ -4,6 +4,8 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.IBinder
+import android.os.SystemClock
+import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,11 +41,21 @@ import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 class OverlayService : Service() {
 
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
+    private var unlockTime: Long = 0
 
     override fun onCreate() {
         super.onCreate()
         setTheme(R.style.Theme_StudyZero)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null) {
+            unlockTime = intent.getLongExtra("unlock", 0L)
+        }
+
         showOverlay()
+        // Your service logic here
+        return START_STICKY
     }
 
     private fun showOverlay() {
@@ -89,6 +101,9 @@ class OverlayService : Service() {
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
         windowManager.addView(composeView, params)
+
+        //Log.d("Time","Now is ${SystemClock.elapsedRealtime()}" )
+        Log.d("Time", "Questions show after ${SystemClock.elapsedRealtime() - unlockTime}")
     }
 
 
@@ -141,18 +156,6 @@ fun Overlay(
                     }
                 }
             }
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally ,
-//                modifier = Modifier
-//                    //.padding(16.dp)
-//                    .wrapContentSize()
-//            ) {
-////                var showHello by remember { mutableStateOf(true) }
-////                if (showHello) {
-////                    Text(text = "Hello from Compose")
-////                }
-//
-//            }
         }
     }
 }
