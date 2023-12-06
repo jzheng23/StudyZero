@@ -11,7 +11,7 @@ import androidx.core.R.drawable.notification_tile_bg
 import androidx.core.app.NotificationCompat
 import com.jianzheng.studyzero.MainActivity
 
-class ForegroundService : Service() {
+class MyForegroundService : Service() {
 
     private lateinit var notificationManager: NotificationManager
 
@@ -23,11 +23,10 @@ class ForegroundService : Service() {
         return null
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
         val notification = buildForegroundNotification()
         startForeground(notificationId, notification)
-        // Continue with service logic
         return START_STICKY
     }
 

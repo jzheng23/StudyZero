@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.jianzheng.studyzero.receiver.UnlockReceiver
-import com.jianzheng.studyzero.service.ForegroundService
+import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.ui.SettingPage
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
@@ -39,10 +39,8 @@ class MainActivity : ComponentActivity() {
         //Check notification permission
         checkNotificationPermission()
 
-
-        val foregroundServiceIntent = Intent(this, ForegroundService::class.java)
-        ContextCompat.startForegroundService(this, foregroundServiceIntent)
-
+        val myForegroundServiceIntent = Intent(this, MyForegroundService::class.java)
+        ContextCompat.startForegroundService(this, myForegroundServiceIntent)
     }
 
     private fun checkNotificationPermission() {

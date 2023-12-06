@@ -32,7 +32,7 @@
             android:enabled="true"
             android:exported="false" />
         <service
-            android:name=".service.ForegroundService"
+            android:name=".service.MyForegroundService"
             android:enabled="true"
             android:exported="false" />
     </application>
