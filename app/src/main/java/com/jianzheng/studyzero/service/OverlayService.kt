@@ -50,13 +50,14 @@ class OverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
+        return if (intent != null) {
             unlockTime = intent.getLongExtra("unlock", 0L)
+            showOverlay()
+            START_STICKY
+        } else {
+            START_REDELIVER_INTENT
         }
-
-        showOverlay()
         // Your service logic here
-        return START_STICKY
     }
 
     private fun showOverlay() {

@@ -2,17 +2,16 @@ package com.jianzheng.studyzero
 
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.service.ForegroundService
+import com.jianzheng.studyzero.ui.SettingPage
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +23,7 @@ class MainActivity : ComponentActivity() {
             StudyZeroTheme {
                 // A surface container using the 'background' color from the theme
                 Surface {
-                    Text("Lock and then unlock your phone to see the floating window")
+                    SettingPage()
                 }
             }
         }

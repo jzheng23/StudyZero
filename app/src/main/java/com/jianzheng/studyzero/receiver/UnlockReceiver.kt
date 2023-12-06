@@ -6,21 +6,24 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import com.jianzheng.studyzero.MainActivity
 import com.jianzheng.studyzero.service.OverlayService
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class UnlockReceiver : BroadcastReceiver() {
     private var startTimeMillis: Long = 0
+    private var delayTimeMillis: Long = 2000L
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_USER_PRESENT) {
-            startTimeMillis = SystemClock.elapsedRealtime()
-            //Log.d("Time", "Broadcast received at $startTimeMillis")
             val serviceIntent = Intent(context, OverlayService::class.java)
+            startTimeMillis = SystemClock.elapsedRealtime()
             serviceIntent.putExtra("unlock", startTimeMillis)
             val handler = Handler(Looper.myLooper()!!)
             handler.postDelayed({
                 context?.startService(serviceIntent)
-            }, 2000L) // 2 seconds delay
+            }, delayTimeMillis) // 2 seconds delay
         }
     }
-
 }
