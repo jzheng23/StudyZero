@@ -35,6 +35,7 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
+import com.jianzheng.studyzero.ui.Overlay
 import com.jianzheng.studyzero.ui.ShowEsm
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
@@ -112,58 +113,3 @@ class OverlayService : Service() {
     }
 }
 
-@Composable
-fun Overlay(
-    onClick: () -> Unit
-) {
-    StudyZeroTheme(isOverlay = true) {
-        Surface(color = Color.Transparent) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                //.wrapContentHeight()
-                //.padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
-                //.background(color = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-
-                ShowEsm()
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 8.dp)
-
-                )
-                {
-                    Button(onClick = {
-                        onClick()
-                    }) {
-                        Text(
-                            text = "Dismiss",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(0.2f))
-                    Button(onClick = {
-                        onClick()
-                    }) {
-                        Text(
-                            text = "Submit",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun OverlayPreview() {
-    Overlay(
-        onClick = {}
-    )
-}
