@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero.ui
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jianzheng.studyzero.R
+import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 val mediumPadding = 12.dp
@@ -54,10 +58,28 @@ fun SettingPage(
                 Text("Lock and then unlock your phone to see the floating window")
                 ShowStatus()
                 ShowOptions()
+                TestButton()
             }
         }
     }
 
+}
+
+@Composable
+fun TestButton() {
+    val context = LocalContext.current
+    val serviceIntent = Intent(context, OverlayService::class.java)
+    Button(
+        onClick = {
+            context.startService(serviceIntent)
+        },
+    ) {
+        Text(
+            text = "Test",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+    }
 }
 
 @Composable
