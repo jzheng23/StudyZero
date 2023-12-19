@@ -57,7 +57,7 @@ fun SettingPage(
             ) {
                 Text("Lock and then unlock your phone to see the floating window")
                 ShowStatus()
-                ShowOptions()
+                //ShowOptions()
                 TestButton()
             }
         }
