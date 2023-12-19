@@ -64,11 +64,11 @@ fun ShowOverlay(
     context: Context
 ) {
     val myViewModel: EsmViewModel = viewModel()
-    var isShowing by remember { mutableStateOf(true) }
+    val isShowing = remember { mutableStateOf(true) }
     val handler = Handler(Looper.myLooper()!!)
     val displayTimeMillis = 10000L
     handler.postDelayed({
-        if (isShowing) {
+        if (isShowing.value) {
             lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             windowManager.removeView(composeView)
             context.stopService(Intent(context, OverlayService::class.java))
@@ -92,7 +92,8 @@ fun ShowOverlay(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         shape = RoundedCornerShape(20.dp)
-                    ),
+                    )
+                ,
                 onClick = { },
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
@@ -103,23 +104,49 @@ fun ShowOverlay(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ShowEsm(myViewModel)
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(mediumPadding),
-                        enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
-                        onClick = {
-                            isShowing = false
-                            onClick()
-                        }) {
-                        Text(
-                            text = "Submit",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
+                    SubmitButton(
+                        myViewModel = myViewModel,
+                        isShowing = isShowing,
+                        onClick = onClick)
+//                    Button(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(mediumPadding),
+//                        enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
+//                        onClick = {
+//                            isShowing.value = false
+//                            onClick()
+//                        }) {
+//                        Text(
+//                            text = "Submit",
+//                            style = MaterialTheme.typography.headlineSmall
+//                        )
+//                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SubmitButton(
+    myViewModel: EsmViewModel,
+    isShowing: MutableState<Boolean>,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(mediumPadding),
+        enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
+        onClick = {
+            isShowing.value = false
+            onClick()
+        }) {
+        Text(
+            text = "Submit",
+            style = MaterialTheme.typography.headlineSmall
+        )
     }
 }
 
