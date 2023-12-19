@@ -163,7 +163,7 @@ fun Overlay(
         if (isShowing) {
             lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             windowManager.removeView(composeView)
-            //context.stopService(OverlayService::class.java)
+            context.stopService(Intent(context, OverlayService::class.java))
         }
 
     }, displayTimeMillis) // 10 seconds delay

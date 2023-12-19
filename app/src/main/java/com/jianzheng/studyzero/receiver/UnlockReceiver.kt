@@ -1,11 +1,13 @@
 package com.jianzheng.studyzero.receiver
 
+import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import androidx.compose.ui.platform.LocalContext
 import com.jianzheng.studyzero.service.OverlayService
 
 class UnlockReceiver : BroadcastReceiver() {
@@ -18,8 +20,20 @@ class UnlockReceiver : BroadcastReceiver() {
             serviceIntent.putExtra("unlock", startTimeMillis)
             val handler = Handler(Looper.myLooper()!!)
             handler.postDelayed({
-                context?.startService(serviceIntent)
+                if (!isMyServiceRunning(OverlayService::class.java, context)) {
+                    context?.startService(serviceIntent)
+                }
             }, delayTimeMillis) // 2 seconds delay
         }
     }
+}
+
+fun isMyServiceRunning(serviceClass: Class<*>, context: Context?): Boolean {
+    val manager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+        if (serviceClass.name == service.service.className) {
+            return true
+        }
+    }
+    return false
 }
