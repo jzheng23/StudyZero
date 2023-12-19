@@ -92,11 +92,11 @@ fun ShowQuestion(
     questionString: Int,
     modifier: Modifier = Modifier,
     index: Int,
-    myViewModel: EsmViewModel
+    myViewModel: EsmViewModel,
 ){
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
-
+    val selectedValue = remember { mutableStateOf(0) }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -140,7 +140,8 @@ fun ShowQuestion(
                         item = item,
                         label = labels[item -1],
                         index = index,
-                        myViewModel = myViewModel
+                        myViewModel = myViewModel,
+                        selectedValue = selectedValue
                     )
                 }
             }
@@ -153,6 +154,7 @@ fun ChoiceWithLabel(
     label: String,
     index: Int,
     myViewModel: EsmViewModel,
+    selectedValue: MutableState<Int>,
     modifier: Modifier = Modifier,
 ){
     Column(
@@ -161,8 +163,12 @@ fun ChoiceWithLabel(
     )
     {
         RadioButton(
-            selected = myViewModel.getAnswer(index) == item,
-            onClick = { myViewModel.setAnswer(item, index) } ,
+            selected = selectedValue.value == item,
+            onClick =
+            {
+                selectedValue.value = item
+                myViewModel.setAnswer(item, index)
+            },
             modifier = modifier
                 .height(22.dp)
         )
