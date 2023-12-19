@@ -1,27 +1,43 @@
 package com.jianzheng.studyzero.ui
 
+import android.content.Context
+import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.view.WindowManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -31,16 +47,88 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jianzheng.studyzero.R
+import com.jianzheng.studyzero.cycle.MyLifecycleOwner
+import com.jianzheng.studyzero.service.OverlayService
+import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowOverlay(
+    onClick: () -> Unit,
+    lifecycleOwner: MyLifecycleOwner,
+    windowManager: WindowManager,
+    composeView: ComposeView,
+    context: Context
+) {
+    val myViewModel: EsmViewModel = viewModel()
+    var isShowing by remember { mutableStateOf(true) }
+    val handler = Handler(Looper.myLooper()!!)
+    val displayTimeMillis = 10000L
+    handler.postDelayed({
+        if (isShowing) {
+            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            windowManager.removeView(composeView)
+            context.stopService(Intent(context, OverlayService::class.java))
+        }
+
+    }, displayTimeMillis) // 10 seconds delay
+
+    StudyZeroTheme(isOverlay = true) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize(),
+            color = Color.White.copy(alpha = 0.5f),
+            onClick = { onClick() }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(mediumPadding)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                onClick = { },
+                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ShowEsm(myViewModel)
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(mediumPadding),
+                        enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
+                        onClick = {
+                            isShowing = false
+                            onClick()
+                        }) {
+                        Text(
+                            text = "Submit",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ShowEsm(
+    myViewModel: EsmViewModel,
     modifier: Modifier = Modifier,
 ) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
-    val myViewModel: EsmViewModel = viewModel()
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,7 +152,7 @@ fun ShowEsm(
 }
 
 @Composable
-fun ShowInstruction(){
+fun ShowInstruction() {
     Text(
         stringResource(R.string.instruction),
         textAlign = TextAlign.Center,
@@ -93,7 +181,7 @@ fun ShowQuestion(
     modifier: Modifier = Modifier,
     index: Int,
     myViewModel: EsmViewModel,
-){
+) {
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
     val selectedValue = remember { mutableStateOf(0) }
@@ -138,7 +226,7 @@ fun ShowQuestion(
                 options.forEach { item ->
                     ChoiceWithLabel(
                         item = item,
-                        label = labels[item -1],
+                        label = labels[item - 1],
                         index = index,
                         myViewModel = myViewModel,
                         selectedValue = selectedValue
@@ -148,6 +236,7 @@ fun ShowQuestion(
         }
     }
 }
+
 @Composable
 fun ChoiceWithLabel(
     item: Int,
@@ -156,7 +245,7 @@ fun ChoiceWithLabel(
     myViewModel: EsmViewModel,
     selectedValue: MutableState<Int>,
     modifier: Modifier = Modifier,
-){
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -168,6 +257,7 @@ fun ChoiceWithLabel(
             {
                 selectedValue.value = item
                 myViewModel.setAnswer(item, index)
+                Log.d("viewModel", "$item selected for q$index!")
             },
             modifier = modifier
                 .height(22.dp)

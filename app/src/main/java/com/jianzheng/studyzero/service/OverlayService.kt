@@ -57,6 +57,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.ui.ShowEsm
+import com.jianzheng.studyzero.ui.ShowOverlay
 import com.jianzheng.studyzero.ui.mediumPadding
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,7 +107,7 @@ class OverlayService : Service() {
         val lifecycleOwner = MyLifecycleOwner()
 
         composeView.setContent {
-            Overlay(
+            ShowOverlay(
                 onClick = {
                     lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
                     windowManager.removeView(composeView)
@@ -147,77 +148,6 @@ class OverlayService : Service() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Overlay(
-    onClick: () -> Unit,
-    lifecycleOwner: MyLifecycleOwner,
-    windowManager: WindowManager,
-    composeView: ComposeView,
-    context: Context
-) {
-    var isShowing by remember { mutableStateOf(true) }
-    val handler = Handler(Looper.myLooper()!!)
-    val displayTimeMillis = 10000L
-    handler.postDelayed({
-        if (isShowing) {
-            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            windowManager.removeView(composeView)
-            context.stopService(Intent(context, OverlayService::class.java))
-        }
-
-    }, displayTimeMillis) // 10 seconds delay
-
-    StudyZeroTheme(isOverlay = true) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize(),
-            color = Color.White.copy(alpha = 0.5f),
-            onClick = {onClick()}
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(mediumPadding)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        shape = RoundedCornerShape(20.dp)
-                    ),
-                onClick = { },
-                //.wrapContentHeight()
-                //.padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
-                //.background(color = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-
-                Column (
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    ShowEsm()
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(mediumPadding),
-                        enabled = true,
-                        onClick = {
-                            isShowing = false
-                            onClick()
-                        }) {
-                        Text(
-                            text = "Submit",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
-                }
-            }
-        }
-
-    }
-}
 
 
 
