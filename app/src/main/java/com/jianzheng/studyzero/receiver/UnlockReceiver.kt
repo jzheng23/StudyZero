@@ -24,7 +24,8 @@ class UnlockReceiver : BroadcastReceiver() {
                 MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
             }
             Intent.ACTION_SCREEN_OFF -> {
-                Log.d("unlock","Screen off!")
+                //Log.d("unlock","Screen off!")
+                MyDelayManager.cancelService()
             }
         }
     }

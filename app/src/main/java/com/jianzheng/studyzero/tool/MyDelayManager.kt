@@ -11,19 +11,17 @@ import kotlinx.coroutines.launch
 
 object MyDelayManager {
     private var job: Job? = null
-    private var numberOfJob: Int = 0
     //var isScheduled: Boolean = false
 
     fun delayService(delayTimeMillis: Long, intent: Intent, context: Context?){
-        //job?.cancel()
         job = CoroutineScope(Dispatchers.Main).launch {
-            //isScheduled = true
-            numberOfJob++
-            Log.d("unlock","$numberOfJob scheduled jobs")
             delay(delayTimeMillis)
             context?.startService(intent)
-            numberOfJob--
-            Log.d("unlock","$numberOfJob scheduled jobs")
         }
+    }
+
+    fun cancelService(){
+        job?.cancel()
+        Log.d("unlock","Job cancelled!")
     }
 }

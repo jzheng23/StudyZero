@@ -6,6 +6,7 @@ import android.graphics.PixelFormat
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
@@ -22,7 +23,6 @@ class OverlayService : Service() {
 
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
-    private val delayTimeMillis: Long = 3000L
 
     companion object {
         @Volatile
@@ -34,6 +34,7 @@ class OverlayService : Service() {
         super.onCreate()
         setTheme(R.style.Theme_StudyZero)
         isRunning = true
+        Log.d("unlock","Overlay service started!")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -111,6 +112,9 @@ class OverlayService : Service() {
     override fun onDestroy() {
         isRunning = false
         super.onDestroy()
+        Log.d("unlock","Overlay service ended!")
+        //lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        //windowManager.removeView(composeView)
     }
 
 }
