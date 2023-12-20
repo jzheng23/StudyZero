@@ -24,17 +24,10 @@ class OverlayService : Service() {
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
 
-    companion object {
-        @Volatile
-        var isRunning = false
-            private set
-    }
 
     override fun onCreate() {
         super.onCreate()
         setTheme(R.style.Theme_StudyZero)
-        isRunning = true
-        Log.d("unlock","Overlay service started!")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -58,13 +51,9 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             layoutFlag,
-            // https://developer.android.com/reference/android/view/WindowManager.LayoutParams
-            // alt: WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-            // WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         )
-
 
         val composeView = ComposeView(this)
         val lifecycleOwner = MyLifecycleOwner()
@@ -83,7 +72,6 @@ class OverlayService : Service() {
             )
         }
 
-        // Trick The ComposeView into thinking we are tracking lifecycle
         val viewModelStoreOwner = object : ViewModelStoreOwner {
             override val viewModelStore: ViewModelStore
                 get() = ViewModelStore()
@@ -99,10 +87,6 @@ class OverlayService : Service() {
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
         windowManager.addView(composeView, params)
-
-
-        //Log.d("Time","Now is ${SystemClock.elapsedRealtime()}" )
-        //Log.d("Time", "Questions show after ${SystemClock.elapsedRealtime() - unlockTime}")
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -110,13 +94,10 @@ class OverlayService : Service() {
     }
 
     override fun onDestroy() {
-        isRunning = false
+//        isRunning = false
         super.onDestroy()
         Log.d("unlock","Overlay service ended!")
-        //lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        //windowManager.removeView(composeView)
     }
-
 }
 
 

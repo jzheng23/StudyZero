@@ -3,7 +3,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
 }
 
 android {
@@ -69,9 +68,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.9.21-1.0.16")
     //Room
-    implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
-    ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
-    implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
 
 
     testImplementation("junit:junit:4.13.2")
