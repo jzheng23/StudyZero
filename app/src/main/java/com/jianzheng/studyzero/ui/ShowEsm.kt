@@ -28,12 +28,11 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +52,11 @@ import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +73,7 @@ fun ShowOverlay(
     val displayTimeMillis = 10000L
     handler.postDelayed({
         if (isShowing.value) {
+            isShowing.value = false
             lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             windowManager.removeView(composeView)
             context.stopService(Intent(context, OverlayService::class.java))
@@ -92,8 +97,7 @@ fun ShowOverlay(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         shape = RoundedCornerShape(20.dp)
-                    )
-                ,
+                    ),
                 onClick = { },
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
@@ -107,21 +111,8 @@ fun ShowOverlay(
                     SubmitButton(
                         myViewModel = myViewModel,
                         isShowing = isShowing,
-                        onClick = onClick)
-//                    Button(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(mediumPadding),
-//                        enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
-//                        onClick = {
-//                            isShowing.value = false
-//                            onClick()
-//                        }) {
-//                        Text(
-//                            text = "Submit",
-//                            style = MaterialTheme.typography.headlineSmall
-//                        )
-//                    }
+                        onClick = onClick
+                    )
                 }
             }
         }
@@ -133,7 +124,7 @@ fun SubmitButton(
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
     onClick: () -> Unit
-){
+) {
     Button(
         modifier = Modifier
             .fillMaxWidth()

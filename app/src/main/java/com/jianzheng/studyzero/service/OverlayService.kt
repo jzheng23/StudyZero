@@ -3,7 +3,9 @@ package com.jianzheng.studyzero.service
 import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.WindowManager
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
@@ -20,12 +22,18 @@ class OverlayService : Service() {
 
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
+    private val delayTimeMillis: Long = 3000L
 
+    companion object {
+        @Volatile
+        var isRunning = false
+            private set
+    }
 
     override fun onCreate() {
         super.onCreate()
         setTheme(R.style.Theme_StudyZero)
-
+        isRunning = true
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -99,6 +107,12 @@ class OverlayService : Service() {
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
+
+    override fun onDestroy() {
+        isRunning = false
+        super.onDestroy()
+    }
+
 }
 
 

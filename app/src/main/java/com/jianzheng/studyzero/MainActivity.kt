@@ -31,7 +31,11 @@ class MainActivity : ComponentActivity() {
         MyPermissionChecker.checkNotificationPermission(this)
 
         //register receiver
-        registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_USER_PRESENT)
+            addAction(Intent.ACTION_SCREEN_OFF)
+        }
+        registerReceiver(unlockReceiver, filter)
         //start foreground service
         val myForegroundServiceIntent = Intent(this, MyForegroundService::class.java)
         ContextCompat.startForegroundService(this, myForegroundServiceIntent)
