@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         val windowManager = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val destination = intent.getStringExtra("NAVIGATE_TO")
         //Log.d("unlock","calling from $destination")
-        val isFromUnlock = destination == "unlock"
+        val isFromUnlock = destination == "esm"
         setContent {
             StudyZeroTheme {
                 Surface {

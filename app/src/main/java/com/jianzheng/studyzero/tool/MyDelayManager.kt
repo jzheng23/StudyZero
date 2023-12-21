@@ -16,7 +16,7 @@ object MyDelayManager {
     fun delayService(delayTimeMillis: Long, intent: Intent, context: Context?){
         job = CoroutineScope(Dispatchers.Main).launch {
             delay(delayTimeMillis)
-            context?.startService(intent)
+            context?.startActivity(intent)
         }
     }
 

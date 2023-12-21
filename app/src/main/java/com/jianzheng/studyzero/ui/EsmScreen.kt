@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -70,53 +72,54 @@ fun EsmScreen(
     windowManager: WindowManager,
     context: Context,
 ) {
+    ShowOverlay(navigateBack,context)
 
-    val layoutFlag: Int =
-        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-
-    val params = WindowManager.LayoutParams(
-        WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.MATCH_PARENT,
-        layoutFlag,
-        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-        PixelFormat.TRANSLUCENT
-    )
-
-    val composeView = ComposeView(context)
-    val lifecycleOwner = MyLifecycleOwner()
-
-
-
-    val viewModelStoreOwner = object : ViewModelStoreOwner {
-        override val viewModelStore: ViewModelStore
-            get() = ViewModelStore()
-    }
-    lifecycleOwner.performRestore(null)
-    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    composeView.setViewTreeLifecycleOwner(lifecycleOwner)
-    composeView.setViewTreeViewModelStoreOwner(viewModelStoreOwner)
-    composeView.setViewTreeSavedStateRegistryOwner(lifecycleOwner)
+//    val layoutFlag: Int =
+//        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
 //
-//     This is required or otherwise the UI will not recompose
-    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
-    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-
-    composeView.setContent {
-        ShowOverlay(
-            onClick = {
-                lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                windowManager.removeView(composeView)
-                navigateBack()
-            },
-//            lifecycleOwner = lifecycleOwner,
-//            windowManager = windowManager,
-//            composeView = composeView,
-//            context = context
-        )
-        Log.d("unlock","composeview set content")
-    }
-
-    windowManager.addView(composeView, params)
+//    val params = WindowManager.LayoutParams(
+//        WindowManager.LayoutParams.MATCH_PARENT,
+//        WindowManager.LayoutParams.MATCH_PARENT,
+//        layoutFlag,
+//        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//        PixelFormat.TRANSLUCENT
+//    )
+//
+//    val composeView = ComposeView(context)
+//    val lifecycleOwner = MyLifecycleOwner()
+//
+//
+//
+//    val viewModelStoreOwner = object : ViewModelStoreOwner {
+//        override val viewModelStore: ViewModelStore
+//            get() = ViewModelStore()
+//    }
+//    lifecycleOwner.performRestore(null)
+//    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+//    composeView.setViewTreeLifecycleOwner(lifecycleOwner)
+//    composeView.setViewTreeViewModelStoreOwner(viewModelStoreOwner)
+//    composeView.setViewTreeSavedStateRegistryOwner(lifecycleOwner)
+////
+////     This is required or otherwise the UI will not recompose
+//    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
+//    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+//
+//    composeView.setContent {
+//        ShowOverlay(
+//            onClick = {
+//                lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//                windowManager.removeView(composeView)
+//                navigateBack()
+//            },
+////            lifecycleOwner = lifecycleOwner,
+////            windowManager = windowManager,
+////            composeView = composeView,
+////            context = context
+//        )
+//        Log.d("unlock","composeview set content")
+//    }
+//
+//    windowManager.addView(composeView, params)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,7 +129,7 @@ fun ShowOverlay(
 //    lifecycleOwner: MyLifecycleOwner,
 //    windowManager: WindowManager,
 //    composeView: ComposeView,
-//    context: Context
+    context: Context
 ) {
     val myViewModel: EsmViewModel = viewModel()
 //    val isShowing = remember { mutableStateOf(false) }
@@ -176,7 +179,8 @@ fun ShowOverlay(
                     SubmitButton(
                         myViewModel = myViewModel,
 //                        isShowing = isShowing,
-                        onClick = onClick
+                        onClick = onClick,
+                        context = context
                     )
                 }
             }
@@ -188,8 +192,10 @@ fun ShowOverlay(
 fun SubmitButton(
     myViewModel: EsmViewModel,
 //    isShowing: MutableState<Boolean>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    context: Context
 ) {
+    val activity = (LocalContext.current as? Activity)
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,6 +204,7 @@ fun SubmitButton(
         onClick = {
 //            isShowing.value = false
             onClick()
+            activity?.finish()
         }) {
         Text(
             text = "Submit",

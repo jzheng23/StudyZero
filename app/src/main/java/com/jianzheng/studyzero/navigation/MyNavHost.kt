@@ -36,10 +36,12 @@ fun MyNavHost(
         }
         composable(route = EsmDestination.route) {
             EsmScreen(
-                navigateBack = {navController.navigate(SettingDestination.route)},
-//                navigateBack = {
-//                    if (isFromUnlock) navController.popBackStack() else navController.navigate(SettingDestination.route)
-//                               },
+//                navigateBack = {navController.navigate(SettingDestination.route)},
+                navigateBack = {
+                    if (isFromUnlock) {
+                        navController.popBackStack()
+                    } else navController.navigate(SettingDestination.route)
+                               },
                 windowManager = windowManager,
                 context = context)
         }
