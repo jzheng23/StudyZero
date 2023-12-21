@@ -21,7 +21,7 @@ import com.jianzheng.studyzero.ui.ShowOverlay
 
 class OverlayService : Service() {
 
-    private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
+    //private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
 
 
@@ -42,8 +42,8 @@ class OverlayService : Service() {
     }
 
 
-    private fun showOverlay() {
-
+    fun showOverlay() {
+        val windowManager: WindowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val layoutFlag: Int =
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
 
@@ -59,17 +59,17 @@ class OverlayService : Service() {
         val lifecycleOwner = MyLifecycleOwner()
 
         composeView.setContent {
-            ShowOverlay(
-                onClick = {
-                    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                    windowManager.removeView(composeView)
-                    stopSelf()
-                },
-                lifecycleOwner = lifecycleOwner,
-                windowManager = windowManager,
-                composeView = composeView,
-                context = this
-            )
+//            ShowOverlay(
+//                onClick = {
+//                    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//                    windowManager.removeView(composeView)
+//                    stopSelf()
+//                },
+//                lifecycleOwner = lifecycleOwner,
+//                windowManager = windowManager,
+//                composeView = composeView,
+//                context = this
+//            )
         }
 
         val viewModelStoreOwner = object : ViewModelStoreOwner {

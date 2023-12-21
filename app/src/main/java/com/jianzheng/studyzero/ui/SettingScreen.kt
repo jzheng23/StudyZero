@@ -27,14 +27,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jianzheng.studyzero.R
+import com.jianzheng.studyzero.navigation.NavigationDestination
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 val mediumPadding = 12.dp
 
-
+object SettingDestination : NavigationDestination {
+    override val route = "setting"
+    override val titleRes = 0
+}
 @Composable
-fun SettingPage(
+fun SettingScreen(
+    navigateToEsm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -58,7 +63,7 @@ fun SettingPage(
                 Text("Lock and then unlock your phone to see the floating window")
                 ShowStatus()
                 //ShowOptions()
-                TestButton()
+                TestButton(navigateToEsm)
             }
         }
     }
@@ -66,13 +71,16 @@ fun SettingPage(
 }
 
 @Composable
-fun TestButton() {
+fun TestButton(
+    onClick: () -> Unit,
+) {
     val context = LocalContext.current
     val serviceIntent = Intent(context, OverlayService::class.java)
     Button(
         onClick = {
-            context.startService(serviceIntent)
-        },
+            onClick()
+            Log.d("unlock","Test clicked")
+        }
     ) {
         Text(
             text = "Test",
@@ -136,7 +144,7 @@ fun PreviewSetting() {
     StudyZeroTheme {
         // A surface container using the 'background' color from the theme
         Surface {
-            SettingPage()
+            SettingScreen({})
         }
     }
 }

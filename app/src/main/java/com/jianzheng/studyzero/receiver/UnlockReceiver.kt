@@ -14,19 +14,19 @@ class UnlockReceiver : BroadcastReceiver() {
     private var unlockCounter: Int = 0
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
-            Intent.ACTION_USER_PRESENT -> {
-                unlockCounter++
-                //Log.d("unlock","unlocked $unlockCounter times")
-                val serviceIntent = Intent(context, OverlayService::class.java)
-                startTimeMillis = SystemClock.elapsedRealtime()
-                serviceIntent.putExtra("unlock", startTimeMillis)
-                context?.stopService(serviceIntent)
-                MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
-            }
-            Intent.ACTION_SCREEN_OFF -> {
-                //Log.d("unlock","Screen off!")
-                MyDelayManager.cancelService()
-            }
+//            Intent.ACTION_USER_PRESENT -> {
+//                unlockCounter++
+//                //Log.d("unlock","unlocked $unlockCounter times")
+//                val serviceIntent = Intent(context, OverlayService::class.java)
+//                startTimeMillis = SystemClock.elapsedRealtime()
+//                serviceIntent.putExtra("unlock", startTimeMillis)
+//                context?.stopService(serviceIntent)
+//                MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
+//            }
+//            Intent.ACTION_SCREEN_OFF -> {
+//                //Log.d("unlock","Screen off!")
+//                MyDelayManager.cancelService()
+//            }
         }
     }
 }

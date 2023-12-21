@@ -2,6 +2,7 @@ package com.jianzheng.studyzero.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PixelFormat
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -28,7 +29,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -47,39 +47,104 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
+import com.jianzheng.studyzero.navigation.NavigationDestination
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
+object EsmDestination : NavigationDestination {
+    override val route = "esm"
+    override val titleRes = 1
+}
+
+@Composable
+fun EsmScreen(
+    navigateBack: () -> Unit,
+    windowManager: WindowManager,
+    context: Context,
+) {
+
+    val layoutFlag: Int =
+        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+
+    val params = WindowManager.LayoutParams(
+        WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams.MATCH_PARENT,
+        layoutFlag,
+        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        PixelFormat.TRANSLUCENT
+    )
+
+    val composeView = ComposeView(context)
+    val lifecycleOwner = MyLifecycleOwner()
+
+
+
+    val viewModelStoreOwner = object : ViewModelStoreOwner {
+        override val viewModelStore: ViewModelStore
+            get() = ViewModelStore()
+    }
+    lifecycleOwner.performRestore(null)
+    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    composeView.setViewTreeLifecycleOwner(lifecycleOwner)
+    composeView.setViewTreeViewModelStoreOwner(viewModelStoreOwner)
+    composeView.setViewTreeSavedStateRegistryOwner(lifecycleOwner)
+//
+//     This is required or otherwise the UI will not recompose
+    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
+    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+
+    composeView.setContent {
+        ShowOverlay(
+            onClick = {
+                lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                windowManager.removeView(composeView)
+                navigateBack()
+            },
+//            lifecycleOwner = lifecycleOwner,
+//            windowManager = windowManager,
+//            composeView = composeView,
+//            context = context
+        )
+        Log.d("unlock","composeview set content")
+    }
+
+    windowManager.addView(composeView, params)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowOverlay(
     onClick: () -> Unit,
-    lifecycleOwner: MyLifecycleOwner,
-    windowManager: WindowManager,
-    composeView: ComposeView,
-    context: Context
+//    lifecycleOwner: MyLifecycleOwner,
+//    windowManager: WindowManager,
+//    composeView: ComposeView,
+//    context: Context
 ) {
     val myViewModel: EsmViewModel = viewModel()
-    val isShowing = remember { mutableStateOf(true) }
-    val handler = Handler(Looper.myLooper()!!)
-    val displayTimeMillis = 10000L
-    handler.postDelayed({
-        if (isShowing.value) {
-            isShowing.value = false
-            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            windowManager.removeView(composeView)
-            context.stopService(Intent(context, OverlayService::class.java))
-        }
+//    val isShowing = remember { mutableStateOf(false) }
 
-    }, displayTimeMillis) // 10 seconds delay
+
+    Log.d("unlock","ShowOverlay Called")
+//    val handler = Handler(Looper.myLooper()!!)
+//    val displayTimeMillis = 10000L
+//    handler.postDelayed({
+//        if (isShowing.value) {
+//            isShowing.value = false
+//            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//            windowManager.removeView(composeView)
+//            context.stopService(Intent(context, OverlayService::class.java))
+//        }
+//
+//    }, displayTimeMillis) // 10 seconds delay
+
 
     StudyZeroTheme(isOverlay = true) {
         Surface(
@@ -110,7 +175,7 @@ fun ShowOverlay(
                     ShowEsm(myViewModel)
                     SubmitButton(
                         myViewModel = myViewModel,
-                        isShowing = isShowing,
+//                        isShowing = isShowing,
                         onClick = onClick
                     )
                 }
@@ -122,7 +187,7 @@ fun ShowOverlay(
 @Composable
 fun SubmitButton(
     myViewModel: EsmViewModel,
-    isShowing: MutableState<Boolean>,
+//    isShowing: MutableState<Boolean>,
     onClick: () -> Unit
 ) {
     Button(
@@ -131,7 +196,7 @@ fun SubmitButton(
             .padding(mediumPadding),
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
-            isShowing.value = false
+//            isShowing.value = false
             onClick()
         }) {
         Text(
@@ -203,6 +268,7 @@ fun ShowQuestion(
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
     val selectedValue = remember { mutableStateOf(0) }
+//    var selectedValue = 0
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -262,6 +328,7 @@ fun ChoiceWithLabel(
     index: Int,
     myViewModel: EsmViewModel,
     selectedValue: MutableState<Int>,
+//    selectedValue: Int,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -271,6 +338,7 @@ fun ChoiceWithLabel(
     {
         RadioButton(
             selected = selectedValue.value == item,
+//            selected = selectedValue == item,
             onClick =
             {
                 selectedValue.value = item
