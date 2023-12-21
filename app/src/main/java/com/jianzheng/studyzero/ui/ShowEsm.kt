@@ -126,6 +126,7 @@ fun SubmitButton(
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
             isShowing.value = false
+            myViewModel.saveAnswer()
             onClick()
         }) {
         Text(

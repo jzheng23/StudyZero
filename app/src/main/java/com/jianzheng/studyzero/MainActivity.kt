@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -39,6 +40,13 @@ class MainActivity : ComponentActivity() {
         //start foreground service
         val myForegroundServiceIntent = Intent(this, MyForegroundService::class.java)
         ContextCompat.startForegroundService(this, myForegroundServiceIntent)
+
+        val sharedPreferences = getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+        if (!sharedPreferences.contains("index")) {
+            val editor = sharedPreferences.edit()
+            editor.putInt("index", 0)
+            editor.apply()
+        }
     }
 
     override fun onDestroy() {
