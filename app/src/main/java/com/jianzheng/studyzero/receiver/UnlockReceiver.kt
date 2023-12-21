@@ -5,8 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
+import com.jianzheng.studyzero.MainActivity
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class UnlockReceiver : BroadcastReceiver() {
     private var startTimeMillis: Long = 0
@@ -22,6 +28,12 @@ class UnlockReceiver : BroadcastReceiver() {
                 serviceIntent.putExtra("unlock", startTimeMillis)
                 context?.stopService(serviceIntent)
                 MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
+//                val intent = Intent(context, MainActivity::class.java)
+//                val job: Job? = CoroutineScope(Dispatchers.Main).launch {
+//                    delay(delayTimeMillis)
+//                    context?.startActivity(intent)
+//                }
+
             }
             Intent.ACTION_SCREEN_OFF -> {
                 //Log.d("unlock","Screen off!")

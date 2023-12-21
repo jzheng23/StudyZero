@@ -7,10 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.tool.MyPermissionChecker
+import com.jianzheng.studyzero.ui.AppViewModelProvider
+import com.jianzheng.studyzero.ui.EsmViewModel
 import com.jianzheng.studyzero.ui.SettingPage
+import com.jianzheng.studyzero.ui.ShowOverlayAlt
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,11 +22,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Log.d("Main", "OnCreate")
+
         setContent {
             StudyZeroTheme {
                 // A surface container using the 'background' color from the theme
                 Surface {
-                    SettingPage()
+                    //SettingPage()
+                    ShowOverlayAlt()
                 }
             }
         }

@@ -14,9 +14,12 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
+import com.jianzheng.studyzero.ui.AppViewModelProvider
+import com.jianzheng.studyzero.ui.EsmViewModel
 import com.jianzheng.studyzero.ui.ShowOverlay
 
 class OverlayService : Service() {

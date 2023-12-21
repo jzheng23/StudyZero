@@ -33,6 +33,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +56,7 @@ import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -67,6 +69,7 @@ fun ShowOverlay(
     composeView: ComposeView,
     context: Context
 ) {
+    //val myViewModel: EsmViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val myViewModel: EsmViewModel = viewModel()
     val isShowing = remember { mutableStateOf(true) }
     val handler = Handler(Looper.myLooper()!!)
@@ -119,18 +122,75 @@ fun ShowOverlay(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowOverlayAlt() {
+    val myViewModel: EsmViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val isShowing = remember { mutableStateOf(true) }
+    val handler = Handler(Looper.myLooper()!!)
+    val displayTimeMillis = 10000L
+    handler.postDelayed({
+        if (isShowing.value) {
+            isShowing.value = false
+        }
+
+    }, displayTimeMillis) // 10 seconds delay
+
+    StudyZeroTheme(isOverlay = true) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize(),
+            color = Color.White.copy(alpha = 0.5f),
+            onClick = { }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(mediumPadding)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                onClick = { },
+                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ShowEsm(myViewModel)
+                    SubmitButton(
+                        myViewModel = myViewModel,
+                        isShowing = isShowing,
+                        onClick = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun SubmitButton(
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
     onClick: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .padding(mediumPadding),
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
+            coroutineScope.launch {
+                myViewModel.saveAnswer()
+            }
             isShowing.value = false
             onClick()
         }) {

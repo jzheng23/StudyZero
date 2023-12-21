@@ -3,14 +3,21 @@ package com.jianzheng.studyzero.ui
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.data.EsmUiState
+import com.jianzheng.studyzero.data.OfflineResponsesRepository
+import com.jianzheng.studyzero.data.ResponsesRepository
+import com.jianzheng.studyzero.data.toResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class EsmViewModel : ViewModel() {
+class EsmViewModel(
+    private val responsesRepository: ResponsesRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(EsmUiState(listOf(0, 0), false))
     val uiState: StateFlow<EsmUiState> = _uiState.asStateFlow()
 
@@ -26,6 +33,9 @@ class EsmViewModel : ViewModel() {
         }
     }
 
+    suspend fun saveAnswer(){
+        responsesRepository.insertResponse(uiState.value.toResponse())
+    }
     fun getAnswer(index: Int): Int {
         return uiState.value.answer[index]
     }
