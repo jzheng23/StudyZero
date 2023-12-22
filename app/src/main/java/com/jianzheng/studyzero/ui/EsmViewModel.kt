@@ -1,6 +1,7 @@
 package com.jianzheng.studyzero.ui
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -11,8 +12,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class EsmViewModel : ViewModel() {
+class EsmViewModel @Inject constructor(private val sharedPreferences: SharedPreferences) : ViewModel() {
     private val _uiState = MutableStateFlow(EsmUiState(listOf(0, 0), false))
     val uiState: StateFlow<EsmUiState> = _uiState.asStateFlow()
 
@@ -29,18 +31,17 @@ class EsmViewModel : ViewModel() {
     }
 
     fun saveAnswer(){
-        updateIndex()
-        val stringToWrite = "index, ${System.currentTimeMillis()},${uiState.value.answer[0]},${uiState.value.answer[1]}"
+        val stringToWrite = "index, ${updateIndex()},${uiState.value.answer[0]},${uiState.value.answer[1]}"
         Log.d("data",stringToWrite)
     }
 
-    private fun updateIndex() {
-//        val sharedPreferences = getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
-//        if (!sharedPreferences.contains("index")) {
-//            val editor = sharedPreferences.edit()
-//            editor.putInt("index", 0)
-//            editor.apply()
-//        }
+    private fun updateIndex():Int {
+        val oldIndex = sharedPreferences.getInt("index", 0)
+        with(sharedPreferences.edit()) {
+            putInt("index", oldIndex + 1)
+            apply()
+        }
+        return sharedPreferences.getInt("index", 0)
     }
 
     fun getAnswer(index: Int): Int {
