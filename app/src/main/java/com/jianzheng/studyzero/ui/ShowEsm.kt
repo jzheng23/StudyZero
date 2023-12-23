@@ -28,7 +28,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -48,19 +47,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
+import com.jianzheng.studyzero.data.EsmDatabase
+import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun ShowOverlay(
     onClick: () -> Unit,
@@ -70,7 +69,16 @@ fun ShowOverlay(
     context: Context
 ) {
     //val myViewModel: EsmViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val myViewModel: EsmViewModel = viewModel()
+//    val responsesRepository: OfflineResponsesRepository by lazy {
+//        OfflineResponsesRepository(EsmDatabase.getDatabase(context).responseDao())
+//    }
+    //val responsesRepository = OfflineResponsesRepository(EsmDatabase.getDatabase(context).responseDao())
+    //val myViewModel = EsmViewModel(responsesRepository)
+    val db = Room.databaseBuilder(context, EsmDatabase::class.java,"response_database").build()
+    Log.d("data","db is $db")
+    val responseDao = db.responseDao()
+    Log.d("data","responseDao is $responseDao")
+    val myViewModel = EsmViewModel(responseDao)
     val isShowing = remember { mutableStateOf(true) }
     val handler = Handler(Looper.myLooper()!!)
     val displayTimeMillis = 10000L
@@ -89,7 +97,7 @@ fun ShowOverlay(
             modifier = Modifier
                 .fillMaxSize(),
             color = Color.White.copy(alpha = 0.5f),
-            onClick = { onClick() }
+            onClick = onClick
         ) {
             Card(
                 modifier = Modifier
@@ -122,59 +130,6 @@ fun ShowOverlay(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShowOverlayAlt() {
-    val myViewModel: EsmViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val isShowing = remember { mutableStateOf(true) }
-    val handler = Handler(Looper.myLooper()!!)
-    val displayTimeMillis = 10000L
-    handler.postDelayed({
-        if (isShowing.value) {
-            isShowing.value = false
-        }
-
-    }, displayTimeMillis) // 10 seconds delay
-
-    StudyZeroTheme(isOverlay = true) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize(),
-            color = Color.White.copy(alpha = 0.5f),
-            onClick = { }
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(mediumPadding)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        shape = RoundedCornerShape(20.dp)
-                    ),
-                onClick = { },
-                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ShowEsm(myViewModel)
-                    SubmitButton(
-                        myViewModel = myViewModel,
-                        isShowing = isShowing,
-                        onClick = { }
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
 fun SubmitButton(
     myViewModel: EsmViewModel,
@@ -188,9 +143,12 @@ fun SubmitButton(
             .padding(mediumPadding),
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.IO) {
                 myViewModel.saveAnswer()
+                Log.d("data","coroutineScope runs")
+
             }
+            Log.d("data","Submit clicked")
             isShowing.value = false
             onClick()
         }) {

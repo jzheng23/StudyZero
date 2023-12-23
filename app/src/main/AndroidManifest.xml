@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
-        android:name=".EsmApplication"
         android:allowBackup="true"
         android:launchMode="singleInstance"
         android:dataExtractionRules="@xml/data_extraction_rules"
