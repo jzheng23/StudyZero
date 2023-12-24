@@ -35,7 +35,10 @@ class MyForegroundService : Service() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val db = Room.databaseBuilder(applicationContext, EsmDatabase::class.java,"response_database").build()
         val responseDao = db.responseDao()
-        countOfResponses = responseDao.getCount()
+        val millisInOneDay = 864000000
+        val currentTime = System.currentTimeMillis()
+        val todayInMillis = (currentTime / millisInOneDay) * millisInOneDay
+        countOfResponses = responseDao.getCountToday(todayInMillis)
     }
     override fun onBind(intent: Intent): IBinder? {
         return null
