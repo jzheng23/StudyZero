@@ -133,6 +133,7 @@ fun SubmitButton(
     context: Context
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val startingTime = System.currentTimeMillis()
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,7 +141,7 @@ fun SubmitButton(
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
             coroutineScope.launch(Dispatchers.IO) {
-                myViewModel.saveAnswer()
+                myViewModel.saveAnswer(startingTime)
                 Log.d("data","coroutineScope runs")
                 val myForegroundServiceIntent = Intent(context, MyForegroundService::class.java)
                 ContextCompat.startForegroundService(context, myForegroundServiceIntent)

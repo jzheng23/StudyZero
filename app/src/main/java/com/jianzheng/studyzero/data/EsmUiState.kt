@@ -5,11 +5,11 @@ data class EsmUiState(
     val isAnswerValid: Boolean
 )
 
-fun EsmUiState.toResponse(): Response = Response(
+fun EsmUiState.toResponse(startingTime: Long): Response = Response(
     id = 0,
     delay = 0,
     answer1 = answer[0],
     answer2 = answer[1],
-    startingTime = 0,
+    startingTime = startingTime,
     submittingTime = System.currentTimeMillis()
 )

@@ -27,8 +27,8 @@ class EsmViewModel(
         }
     }
 
-    suspend fun saveAnswer(){
-        responseDao.insert(uiState.value.toResponse())
+    suspend fun saveAnswer(startingTime: Long){
+        responseDao.insert(uiState.value.toResponse(startingTime))
         Log.d("data","data saved")
     }
     fun getAnswer(index: Int): Int {
