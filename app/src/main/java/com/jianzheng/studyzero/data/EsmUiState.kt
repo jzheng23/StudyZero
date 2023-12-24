@@ -11,5 +11,5 @@ fun EsmUiState.toResponse(): Response = Response(
     answer1 = answer[0],
     answer2 = answer[1],
     startingTime = 0,
-    submittingTime = 0
+    submittingTime = System.currentTimeMillis()
 )

@@ -46,12 +46,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.room.Room
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.data.Response
+import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -68,16 +70,8 @@ fun ShowOverlay(
     composeView: ComposeView,
     context: Context
 ) {
-    //val myViewModel: EsmViewModel = viewModel(factory = AppViewModelProvider.Factory)
-//    val responsesRepository: OfflineResponsesRepository by lazy {
-//        OfflineResponsesRepository(EsmDatabase.getDatabase(context).responseDao())
-//    }
-    //val responsesRepository = OfflineResponsesRepository(EsmDatabase.getDatabase(context).responseDao())
-    //val myViewModel = EsmViewModel(responsesRepository)
     val db = Room.databaseBuilder(context, EsmDatabase::class.java,"response_database").build()
-    Log.d("data","db is $db")
     val responseDao = db.responseDao()
-    Log.d("data","responseDao is $responseDao")
     val myViewModel = EsmViewModel(responseDao)
     val isShowing = remember { mutableStateOf(true) }
     val handler = Handler(Looper.myLooper()!!)
@@ -122,7 +116,8 @@ fun ShowOverlay(
                     SubmitButton(
                         myViewModel = myViewModel,
                         isShowing = isShowing,
-                        onClick = onClick
+                        onClick = onClick,
+                        context = context
                     )
                 }
             }
@@ -134,7 +129,8 @@ fun ShowOverlay(
 fun SubmitButton(
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    context: Context
 ) {
     val coroutineScope = rememberCoroutineScope()
     Button(
@@ -146,7 +142,8 @@ fun SubmitButton(
             coroutineScope.launch(Dispatchers.IO) {
                 myViewModel.saveAnswer()
                 Log.d("data","coroutineScope runs")
-
+                val myForegroundServiceIntent = Intent(context, MyForegroundService::class.java)
+                ContextCompat.startForegroundService(context, myForegroundServiceIntent)
             }
             Log.d("data","Submit clicked")
             isShowing.value = false
