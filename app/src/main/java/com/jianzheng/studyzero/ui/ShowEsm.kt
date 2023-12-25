@@ -9,6 +9,7 @@ import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -43,6 +48,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -103,16 +109,22 @@ fun ShowOverlay(
                 shape = RoundedCornerShape(20.dp)
             ) {
 
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ShowEsm(myViewModel)
-                    SubmitButton(
-                        myViewModel = myViewModel,
-                        isShowing = isShowing,
-                        onClick = onClick,
-                        context = context
+                Box {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ShowEsm(myViewModel)
+                        SubmitButton(
+                            myViewModel = myViewModel,
+                            isShowing = isShowing,
+                            onClick = onClick,
+                            context = context
+                        )
+                    }
+                    DismissButton(
+                        onDismiss =  onClick,
+                        modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }
             }
@@ -200,7 +212,12 @@ fun ShowInstruction() {
             )
         ),
         modifier = Modifier
-            .padding(horizontal = mediumPadding, vertical = mediumPadding / 2)
+            .padding(
+                top = mediumPadding * 2,
+                bottom = mediumPadding / 2,
+                start = mediumPadding / 2,
+                end = mediumPadding / 2
+            )
     )
 }
 
@@ -310,6 +327,21 @@ fun ChoiceWithLabel(
             modifier = modifier
                 .width(55.dp)
 
+        )
+    }
+}
+
+@Composable
+fun DismissButton(
+    onDismiss: () -> Unit,
+    modifier: Modifier
+) {
+    IconButton(
+        onClick = onDismiss,
+        modifier = modifier) {
+        Icon(
+            imageVector = Icons.Filled.Close,
+            contentDescription = "Dismiss"
         )
     }
 }
