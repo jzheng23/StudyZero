@@ -91,19 +91,14 @@ fun ShowOverlay(
             modifier = Modifier
                 .fillMaxSize(),
             color = Color.White.copy(alpha = 0.5f),
-            onClick = onClick
+//            onClick = onClick
         ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(mediumPadding)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        shape = RoundedCornerShape(20.dp)
-                    ),
-                onClick = { },
+                    .padding(mediumPadding),
+//                onClick = { },
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
             ) {
