@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class UnlockReceiver : BroadcastReceiver() {
     private var startTimeMillis: Long = 0
-    private val delayTimeMillis: Long = 3000
+    private val delayTimeMillis: Long = 1500
     private var unlockCounter: Int = 0
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
