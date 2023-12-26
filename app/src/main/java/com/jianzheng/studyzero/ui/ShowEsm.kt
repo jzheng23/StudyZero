@@ -213,7 +213,7 @@ fun ShowInstruction() {
         ),
         modifier = Modifier
             .padding(
-                top = mediumPadding * 2,
+                top = mediumPadding * 3,
                 bottom = mediumPadding / 2,
                 start = mediumPadding / 2,
                 end = mediumPadding / 2
@@ -338,7 +338,8 @@ fun DismissButton(
 ) {
     IconButton(
         onClick = onDismiss,
-        modifier = modifier) {
+        modifier = modifier
+    ) {
         Icon(
             imageVector = Icons.Filled.Close,
             contentDescription = "Dismiss"

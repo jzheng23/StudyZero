@@ -37,10 +37,6 @@ class MyForegroundService : Service() {
             Room.databaseBuilder(applicationContext, EsmDatabase::class.java, "response_database")
                 .build()
         responseDao = db.responseDao()
-//        val millisInOneDay = 864000000
-//        val currentTime = System.currentTimeMillis()
-//        val todayInMillis = (currentTime / millisInOneDay) * millisInOneDay
-//        countOfResponses = responseDao.getCountToday(todayInMillis)
     }
 
     override fun onBind(intent: Intent): IBinder? {
