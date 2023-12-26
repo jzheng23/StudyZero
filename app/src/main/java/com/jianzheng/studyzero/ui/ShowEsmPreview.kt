@@ -1,7 +1,5 @@
 package com.jianzheng.studyzero.ui
 
-import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,10 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,12 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.jianzheng.studyzero.R
-import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun ShowOverlayPreview() {
@@ -89,8 +81,6 @@ fun ShowOverlayPreview() {
 
 @Composable
 fun SubmitButtonPreview() {
-    val coroutineScope = rememberCoroutineScope()
-    val startingTime = System.currentTimeMillis()
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,21 +108,18 @@ fun ShowEsmPreview(modifier: Modifier = Modifier) {
         //show question 1
         ShowQuestionPreview(
             questionString = R.string.question1,
-            index = 0
         )
         ShowQuestionPreview(
             questionString = R.string.question2,
-            index = 1
         )
     }
 }
 
 @Composable
 fun ShowQuestionPreview(
-    questionString: Int, 
-    index: Int,
+    questionString: Int,
     modifier: Modifier = Modifier
-    ) {
+) {
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
     val selectedValue = remember { mutableStateOf(0) }
@@ -178,7 +165,6 @@ fun ShowQuestionPreview(
                     ChoiceWithLabelPreview(
                         item = item,
                         label = labels[item - 1],
-                        index = index,
                         selectedValue = selectedValue
                     )
                 }
@@ -191,11 +177,9 @@ fun ShowQuestionPreview(
 fun ChoiceWithLabelPreview(
     item: Int,
     label: String,
-    index: Int,
     selectedValue: MutableState<Int>,
     modifier: Modifier = Modifier,
-)
-{
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

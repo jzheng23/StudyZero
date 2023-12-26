@@ -7,7 +7,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +47,6 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -58,13 +56,11 @@ import androidx.room.Room
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.data.EsmDatabase
-import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
@@ -76,7 +72,7 @@ fun ShowOverlay(
     composeView: ComposeView,
     context: Context
 ) {
-    val db = Room.databaseBuilder(context, EsmDatabase::class.java,"response_database").build()
+    val db = Room.databaseBuilder(context, EsmDatabase::class.java, "response_database").build()
     val responseDao = db.responseDao()
     val myViewModel = EsmViewModel(responseDao)
     val isShowing = remember { mutableStateOf(true) }
@@ -123,7 +119,7 @@ fun ShowOverlay(
                         )
                     }
                     DismissButton(
-                        onDismiss =  onClick,
+                        onDismiss = onClick,
                         modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }
@@ -149,11 +145,11 @@ fun SubmitButton(
         onClick = {
             coroutineScope.launch(Dispatchers.IO) {
                 myViewModel.saveAnswer(startingTime)
-                Log.d("data","coroutineScope runs")
+                Log.d("data", "coroutineScope runs")
                 val myForegroundServiceIntent = Intent(context, MyForegroundService::class.java)
                 ContextCompat.startForegroundService(context, myForegroundServiceIntent)
             }
-            Log.d("data","Submit clicked")
+            Log.d("data", "Submit clicked")
             isShowing.value = false
             onClick()
         }) {

@@ -28,10 +28,6 @@ class UnlockReceiver : BroadcastReceiver() {
                 serviceIntent.putExtra("unlock", startTimeMillis)
                 context?.stopService(serviceIntent)
                 MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
-//                val intent = Intent(context, MainActivity::class.java)
-//                val job: Job? = CoroutineScope(Dispatchers.Main).launch {
-//                    delay(delayTimeMillis)
-//                    context?.startActivity(intent)
 //                }
 
             }
