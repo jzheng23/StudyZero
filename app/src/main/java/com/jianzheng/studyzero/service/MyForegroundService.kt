@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MyForegroundService : Service() {
 
@@ -30,17 +31,16 @@ class MyForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("fore", "onCreate")
+//        Log.d("fore", "onCreate")
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val db =
             Room.databaseBuilder(applicationContext, EsmDatabase::class.java, "response_database")
                 .build()
         responseDao = db.responseDao()
-        val millisInOneDay = 864000000
-        val currentTime = System.currentTimeMillis()
-        val todayInMillis = (currentTime / millisInOneDay) * millisInOneDay
-//        Log.d("fore","current is $currentTime today is $todayInMillis")
-        countOfResponses = responseDao.getCountToday(todayInMillis)
+//        val millisInOneDay = 864000000
+//        val currentTime = System.currentTimeMillis()
+//        val todayInMillis = (currentTime / millisInOneDay) * millisInOneDay
+//        countOfResponses = responseDao.getCountToday(todayInMillis)
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -49,17 +49,12 @@ class MyForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        Log.d("fore", "onStartCommand")
-        val millisInOneDay = 86400000
-        val currentTime = System.currentTimeMillis()
-        val todayInMillis = (currentTime / millisInOneDay) * millisInOneDay
-        Log.d("fore","current is $currentTime today is $todayInMillis")
-        countOfResponses = responseDao.getCountToday(todayInMillis)
         updateCount()
         return START_STICKY
     }
 
     private fun updateCount() {
+        countOfResponses = responseDao.getCountToday(todayStarts())
         serviceScope.launch {
             countOfResponses.collect {
                 val notification = buildForegroundNotification(it)
@@ -97,4 +92,13 @@ class MyForegroundService : Service() {
         const val channelId = "timer_channel"
     }
 
+    private fun todayStarts(): Long {
+        val startOfDayCalendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return startOfDayCalendar.timeInMillis
+    }
 }
