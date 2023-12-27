@@ -21,6 +21,8 @@ class OverlayService : Service() {
 
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
+    private lateinit var composeView: ComposeView
+    private lateinit var lifecycleOwner: MyLifecycleOwner
 
 
     override fun onCreate() {
@@ -53,8 +55,8 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
-        val composeView = ComposeView(this)
-        val lifecycleOwner = MyLifecycleOwner()
+        composeView = ComposeView(this)
+        lifecycleOwner = MyLifecycleOwner()
 
         composeView.setContent {
             ShowOverlay(
@@ -92,9 +94,10 @@ class OverlayService : Service() {
     }
 
     override fun onDestroy() {
-//        isRunning = false
         super.onDestroy()
-        Log.d("unlock","Overlay service ended!")
+        lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//        windowManager.removeView(composeView)
+        Log.d("unlock","OverlayService OnDestroy")
     }
 }
 

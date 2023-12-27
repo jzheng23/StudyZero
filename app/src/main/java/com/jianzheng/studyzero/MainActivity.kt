@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -51,12 +52,27 @@ class MainActivity : ComponentActivity() {
         val myForegroundServiceIntent = Intent(this, MyForegroundService::class.java)
         ContextCompat.startForegroundService(this, myForegroundServiceIntent)
 
+        //start room
         val db = Room.databaseBuilder(applicationContext, EsmDatabase::class.java,"response_database").build()
         val responseDao = db.responseDao()
-
         GlobalScope.launch(Dispatchers.IO) {
             responseDao.insert(Response(id = 1, delay = 0, answer1 = 9, answer2 = 9, startingTime = 0, submittingTime = 0))
         }
+
+        createSharedPreference()
+    }
+
+    private fun createSharedPreference() {
+        val sharedPreferences = getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+
+        // Open the editor to make changes
+        val editor = sharedPreferences.edit()
+
+        // Put values
+        editor.putString("example_key", "Hello, SharedPreferences!")
+            .putBoolean("first_run",false)
+            .putInt("some_int",0)
+            .apply()
     }
 
     override fun onDestroy() {

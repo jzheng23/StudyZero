@@ -5,36 +5,42 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
-import com.jianzheng.studyzero.MainActivity
+import androidx.compose.ui.platform.LocalContext
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class UnlockReceiver : BroadcastReceiver() {
     private var startTimeMillis: Long = 0
-    private val delayTimeMillis: Long = 1500
     private var unlockCounter: Int = 0
+    private val maxOfPrompts = 30 //TODO need to be the dynamic len of trigger list
     override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
-            Intent.ACTION_USER_PRESENT -> {
-                unlockCounter++
-                //Log.d("unlock","unlocked $unlockCounter times")
-                val serviceIntent = Intent(context, OverlayService::class.java)
-                startTimeMillis = SystemClock.elapsedRealtime()
-                serviceIntent.putExtra("unlock", startTimeMillis)
-                context?.stopService(serviceIntent)
-                MyDelayManager.delayService(delayTimeMillis, serviceIntent, context)
-//                }
+        checkCountOfUnlock(context)
+        if (unlockCounter < maxOfPrompts) {
+            when (intent?.action) {
+                Intent.ACTION_USER_PRESENT -> {
+                    val serviceIntent = Intent(context, OverlayService::class.java)
+                    startTimeMillis = SystemClock.elapsedRealtime()
+                    serviceIntent.putExtra("unlock", startTimeMillis)
+                    MyDelayManager.delayService(serviceIntent, context)
+                    unlockCounter++
+                }
 
-            }
-            Intent.ACTION_SCREEN_OFF -> {
-                //Log.d("unlock","Screen off!")
-                MyDelayManager.cancelService()
+                Intent.ACTION_SCREEN_OFF -> {
+                    val serviceIntent = Intent(context, OverlayService::class.java)
+                    context?.stopService(serviceIntent)
+                    MyDelayManager.cancelService()
+                }
             }
         }
+    }
+
+    private fun checkCountOfUnlock(context: Context?) {
+        val sharedPreferences = context?.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+
+        // Retrieve the string value, providing a default value if the key doesn't exist
+        val retrievedValue = sharedPreferences?.getString("example_key", "Default Value")
+
+        // Use the retrieved value as needed
+        Log.d("preference","$retrievedValue")
     }
 }
