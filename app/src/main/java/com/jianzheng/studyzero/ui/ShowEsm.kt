@@ -58,6 +58,7 @@ import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.service.OverlayService
+import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ fun ShowOverlay(
     val responseDao = db.responseDao()
     val myViewModel = EsmViewModel(responseDao)
     val isShowing = remember { mutableStateOf(true) }
+    //TODO need to tidy up
     val handler = Handler(Looper.myLooper()!!)
     val displayTimeMillis = 10000L
     handler.postDelayed({
@@ -333,7 +335,10 @@ fun DismissButton(
     modifier: Modifier
 ) {
     IconButton(
-        onClick = onDismiss,
+        onClick = {
+            onDismiss()
+            MyDelayManager.recycleTrigger()
+        },
         modifier = modifier
     ) {
         Icon(

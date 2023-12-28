@@ -12,24 +12,25 @@ import com.jianzheng.studyzero.tool.MyDelayManager
 class UnlockReceiver : BroadcastReceiver() {
     private var startTimeMillis: Long = 0
     private var unlockCounter: Int = 0
-    private val maxOfPrompts = 30 //TODO need to be the dynamic len of trigger list
+//    private val maxOfPrompts = 30 //TODO need to be the dynamic len of trigger list
     override fun onReceive(context: Context?, intent: Intent?) {
-        checkCountOfUnlock(context)
-        if (unlockCounter < maxOfPrompts) {
-            when (intent?.action) {
-                Intent.ACTION_USER_PRESENT -> {
-                    val serviceIntent = Intent(context, OverlayService::class.java)
-                    startTimeMillis = SystemClock.elapsedRealtime()
-                    serviceIntent.putExtra("unlock", startTimeMillis)
-                    MyDelayManager.delayService(serviceIntent, context)
-                    unlockCounter++
-                }
+//        checkCountOfUnlock(context)
+//        if (unlockCounter < maxOfPrompts) {
+//
+//        }
+        when (intent?.action) {
+            Intent.ACTION_USER_PRESENT -> {
+                val serviceIntent = Intent(context, OverlayService::class.java)
+                startTimeMillis = SystemClock.elapsedRealtime()
+                serviceIntent.putExtra("unlock", startTimeMillis)
+                MyDelayManager.delayService(serviceIntent, context)
+                unlockCounter++
+            }
 
-                Intent.ACTION_SCREEN_OFF -> {
-                    val serviceIntent = Intent(context, OverlayService::class.java)
-                    context?.stopService(serviceIntent)
-                    MyDelayManager.cancelService()
-                }
+            Intent.ACTION_SCREEN_OFF -> {
+                val serviceIntent = Intent(context, OverlayService::class.java)
+                context?.stopService(serviceIntent)
+                MyDelayManager.cancelService()
             }
         }
     }
