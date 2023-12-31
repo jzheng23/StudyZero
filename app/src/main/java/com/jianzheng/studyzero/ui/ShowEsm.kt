@@ -79,7 +79,7 @@ fun ShowOverlay(
     val isShowing = remember { mutableStateOf(true) }
     //TODO need to tidy up
     val handler = Handler(Looper.myLooper()!!)
-    val displayTimeMillis = 10000L
+    val displayTimeMillis = 10000L //10 seconds for testing, 30 seconds for real data collection
     handler.postDelayed({
         if (isShowing.value) {
             isShowing.value = false
@@ -87,7 +87,6 @@ fun ShowOverlay(
             windowManager.removeView(composeView)
             context.stopService(Intent(context, OverlayService::class.java))
         }
-
     }, displayTimeMillis) // 10 seconds delay
 
     StudyZeroTheme(isOverlay = true) {
