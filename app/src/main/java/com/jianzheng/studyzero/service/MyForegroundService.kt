@@ -37,6 +37,8 @@ class MyForegroundService : Service() {
             Room.databaseBuilder(applicationContext, EsmDatabase::class.java, "response_database")
                 .build()
         responseDao = db.responseDao()
+        createNotificationChannel()
+        updateCount()
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -44,7 +46,7 @@ class MyForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        createNotificationChannel()
+//        createNotificationChannel()
         updateCount()
         return START_STICKY
     }

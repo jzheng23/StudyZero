@@ -97,8 +97,9 @@ class OverlayService : Service() {
         super.onDestroy()
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 //        windowManager.removeView(composeView)
-        Log.d("unlock","OverlayService OnDestroy")
+//        Log.d("unlock","OverlayService OnDestroy")
     }
+    
 }
 
 

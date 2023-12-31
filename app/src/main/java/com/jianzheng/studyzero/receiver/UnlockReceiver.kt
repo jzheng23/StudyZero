@@ -23,7 +23,9 @@ class UnlockReceiver : BroadcastReceiver() {
                 val serviceIntent = Intent(context, OverlayService::class.java)
                 startTimeMillis = SystemClock.elapsedRealtime()
                 serviceIntent.putExtra("unlock", startTimeMillis)
-                MyDelayManager.delayService(serviceIntent, context)
+                if (context != null) {
+                    MyDelayManager.delayService(serviceIntent, context)
+                }
                 unlockCounter++
             }
 
