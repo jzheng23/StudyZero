@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -22,7 +23,7 @@ object MyDelayManager {
     private val delayList = mutableListOf(1, 3, 5, 8, 12)
 
     //    private val displayTimeMillis = 10000L
-    private const val extraTrigger = 1L
+    private const val extraTrigger = 1L //one minute for testing
     private var isTriggerScheduled = false
     private var triggerIndex: Int = 0
 
@@ -44,7 +45,7 @@ object MyDelayManager {
                 WorkManager.getInstance(context).enqueue(triggerRequest)
 //                delay(delayList[triggerIndex] * 1000L)
 //                context.startService(intent)
-//                isTriggerScheduled = false
+                isTriggerScheduled = false
                 Log.d("unlock","index is $triggerIndex")
             }
             job2 = scope.launch {
@@ -60,18 +61,16 @@ object MyDelayManager {
 
     fun cancelService() {
 
-//        scope.cancel()
+        scope.coroutineContext.cancelChildren()
 //        Log.d("unlock","Job cancelled!")
-        job1?.cancel()
-        job2?.cancel()
-//        if (isTriggerScheduled) {
-//            Log.d("unlock", "unlocked $triggerIndex times")
-//            recycleTrigger()
-//            job1?.cancel()
-//            Log.d("unlock", "Job cancelled! Len of list is ${delayList.size}")
-//        } else {
-//            Log.d("unlock", "Nothing to cancel")
-//        }
+//        job1?.cancel()
+//        job2?.cancel()
+        if (isTriggerScheduled) {
+            recycleTrigger()
+            Log.d("unlock", "Job cancelled! Len of list is ${delayList.size}")
+        } else {
+            Log.d("unlock", "Nothing to cancel")
+        }
     }
 
     fun recycleTrigger() {
