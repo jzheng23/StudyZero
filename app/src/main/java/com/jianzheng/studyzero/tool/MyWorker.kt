@@ -10,11 +10,11 @@ import com.jianzheng.studyzero.service.OverlayService
 class MyWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     //    val inputData = params.inputData
     override fun doWork(): Result {
-        Log.d("unlock", "do work!")
         val tag = inputData.getString("tag")
         val serviceIntent = Intent(applicationContext, OverlayService::class.java).apply{
             putExtra("tag", tag)
         }
+        Log.d("unlock", "triggered by $tag")
         applicationContext.startService(serviceIntent)
         return Result.success()
     }

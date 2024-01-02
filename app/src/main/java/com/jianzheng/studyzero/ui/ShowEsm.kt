@@ -1,11 +1,9 @@
 package com.jianzheng.studyzero.ui
 
-import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +38,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -52,13 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import androidx.room.Room
 import com.jianzheng.studyzero.R
-import com.jianzheng.studyzero.cycle.MyLifecycleOwner
 import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.service.MyForegroundService
-import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.tool.ResponseCounter
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
@@ -75,13 +69,13 @@ fun ShowOverlay(
     val db = Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database").build()
     val responseDao = db.responseDao()
     val myViewModel = EsmViewModel(responseDao)
-    val isShowing = remember { mutableStateOf(true) }
+    val autoDismiss = remember { mutableStateOf(true) }
     //TODO need to tidy up
     val handler = Handler(Looper.myLooper()!!)
     val displayTimeMillis = 10000L //10 seconds for testing, 30 seconds for real data collection
     handler.postDelayed({
-        if (isShowing.value) {
-            isShowing.value = false
+        if (autoDismiss.value) {
+            autoDismiss.value = false
             onClick()
             MyDelayManager.recycleTrigger()
 //            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -103,7 +97,9 @@ fun ShowOverlay(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(mediumPadding),
-//                onClick = { },
+                onClick = {
+                    autoDismiss.value = false
+                },
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
             ) {
@@ -113,11 +109,13 @@ fun ShowOverlay(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        ShowEsm(myViewModel)
+                        ShowEsm(
+                            myViewModel,
+                            autoDismiss)
                         SubmitButton(
                             tag = tag,
                             myViewModel = myViewModel,
-                            isShowing = isShowing,
+                            isShowing = autoDismiss,
                             onClick = onClick
                         )
                     }
@@ -167,6 +165,7 @@ fun SubmitButton(
 @Composable
 fun ShowEsm(
     myViewModel: EsmViewModel,
+    autoDismiss: MutableState<Boolean> ,
     modifier: Modifier = Modifier,
 ) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
@@ -182,12 +181,14 @@ fun ShowEsm(
         ShowQuestion(
             questionString = R.string.question1,
             index = 0,
-            myViewModel = myViewModel
+            myViewModel = myViewModel,
+            autoDismiss = autoDismiss
         )
         ShowQuestion(
             questionString = R.string.question2,
             index = 1,
-            myViewModel = myViewModel
+            myViewModel = myViewModel,
+            autoDismiss = autoDismiss
         )
     }
 }
@@ -227,6 +228,7 @@ fun ShowQuestion(
     modifier: Modifier = Modifier,
     index: Int,
     myViewModel: EsmViewModel,
+    autoDismiss: MutableState<Boolean>
 ) {
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
@@ -275,6 +277,7 @@ fun ShowQuestion(
                         label = labels[item - 1],
                         index = index,
                         myViewModel = myViewModel,
+                        autoDismiss = autoDismiss,
                         selectedValue = selectedValue
                     )
                 }
@@ -290,6 +293,7 @@ fun ChoiceWithLabel(
     index: Int,
     myViewModel: EsmViewModel,
     selectedValue: MutableState<Int>,
+    autoDismiss: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -302,6 +306,7 @@ fun ChoiceWithLabel(
             onClick =
             {
                 selectedValue.value = item
+                autoDismiss.value = false
                 myViewModel.setAnswer(item, index)
                 Log.d("viewModel", "$item selected for q$index!")
             },

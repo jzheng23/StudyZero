@@ -63,8 +63,8 @@ class OverlayService : Service() {
             ShowOverlay(
                 tag = tag,
                 onClick = {
-                    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                    windowManager.removeView(composeView)
+//                    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//                    windowManager.removeView(composeView)
                     stopSelf()
                 }
             )
@@ -94,7 +94,7 @@ class OverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-//        windowManager.removeView(composeView)
+        windowManager.removeView(composeView)
 //        Log.d("unlock","OverlayService OnDestroy")
     }
     

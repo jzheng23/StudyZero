@@ -12,7 +12,7 @@ class ResponseCounter(context: Context) {
         val retrievedValue = sharedPreferences.getInt(tag, 0)
         editor.putInt(tag, retrievedValue + 1)
             .apply()
-        Log.d("counter", tag + "is ${retrievedValue + 1}")
+        Log.d("unlock", "$tag is ${retrievedValue + 1}")
     }
 
     fun check20Met(): Boolean {

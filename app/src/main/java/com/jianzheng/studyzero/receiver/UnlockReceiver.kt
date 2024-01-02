@@ -3,9 +3,7 @@ package com.jianzheng.studyzero.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
 
@@ -32,7 +30,7 @@ class UnlockReceiver : BroadcastReceiver() {
                     putExtra("tag", "none")
                 }
                 context?.stopService(serviceIntent)
-                MyDelayManager.cancelService()
+                MyDelayManager.cancelScheduledService()
             }
         }
     }

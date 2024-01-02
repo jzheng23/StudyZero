@@ -19,11 +19,10 @@ object MyDelayManager {
     private const val extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
     private const val extraTriggerTwenty = 20L
     private var triggerIndex: Int = 0
-    private var isJobScheduled = false
     private lateinit var myWorkManager: WorkManager
-    private lateinit var randomTriggerRequestID: UUID
-
-
+    private lateinit var randomRequestID: UUID
+    private lateinit var twentyRequestID: UUID
+    private lateinit var thirtyRequestID: UUID
 
     fun delayService(context: Context) {
         myWorkManager = WorkManager.getInstance(context)
@@ -34,7 +33,7 @@ object MyDelayManager {
                 .setInputData(workDataOf("tag" to context.getString(R.string.random_met)))
                 .build()
             myWorkManager.enqueue(triggerRequest)
-            randomTriggerRequestID = triggerRequest.id
+            randomRequestID = triggerRequest.id
             triggerIndex++
         }
         if (responseCounter.check20Met()) {
@@ -44,6 +43,7 @@ object MyDelayManager {
                 .setInputData(workDataOf("tag" to context.getString(R.string._20met)))
                 .build()
             myWorkManager.enqueue(twentyTriggerRequest)
+            twentyRequestID = twentyTriggerRequest.id
         }
         if (responseCounter.check30Met()) {
             val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
@@ -52,21 +52,45 @@ object MyDelayManager {
                 .setInputData(workDataOf("tag" to context.getString(R.string._30met)))
                 .build()
             myWorkManager.enqueue(thirtyTriggerRequest)
+            thirtyRequestID = thirtyTriggerRequest.id
         }
 
     }
 
-    fun cancelService() {
-        if (::myWorkManager.isInitialized and ::randomTriggerRequestID.isInitialized) {
+
+    fun cancelScheduledService() {
+        if (::myWorkManager.isInitialized) {
             val scope = CoroutineScope(Dispatchers.IO)
             scope.launch {
-                if (myWorkManager.getWorkInfoById(randomTriggerRequestID).get().state
-                    != WorkInfo.State.SUCCEEDED
-                ) {
-                    myWorkManager.cancelWorkById(randomTriggerRequestID)
-                    recycleTrigger()
+                checkAndCancelRandomTrigger()
+                if (::twentyRequestID.isInitialized) {
+                    checkAndCancelFixedTrigger(twentyRequestID)
+                }
+                if (::thirtyRequestID.isInitialized) {
+                    checkAndCancelFixedTrigger(thirtyRequestID)
                 }
             }
+        }
+    }
+
+    private fun checkAndCancelRandomTrigger() {
+        if (::randomRequestID.isInitialized) {
+            if (myWorkManager.getWorkInfoById(randomRequestID).get().state
+                != WorkInfo.State.SUCCEEDED
+            ) {
+                myWorkManager.cancelWorkById(randomRequestID)
+                Log.d("unlock","a random trigger is canceled")
+                recycleTrigger()
+            }
+        }
+    }
+
+    private fun checkAndCancelFixedTrigger(requestID: UUID) {
+        if (myWorkManager.getWorkInfoById(requestID).get().state
+            != WorkInfo.State.SUCCEEDED
+        ) {
+            myWorkManager.cancelWorkById(requestID)
+            Log.d("unlock","a fixed trigger is canceled")
         }
     }
 
