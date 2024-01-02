@@ -14,8 +14,10 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object MyDelayManager {
-    //    private val delayList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
-    private val triggerList = mutableListOf(1, 5, 12)
+    //    private val originalTriggerList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
+    private var originalTriggerList = mutableListOf(1, 5, 12)
+    private var triggerList = originalTriggerList.shuffled()
+
     private const val extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
     private const val extraTriggerTwenty = 20L
     private var triggerIndex: Int = 0
@@ -34,6 +36,10 @@ object MyDelayManager {
                 .build()
             myWorkManager.enqueue(triggerRequest)
             randomRequestID = triggerRequest.id
+            Log.d(
+                "unlock",
+                "random trigger $triggerIndex is scheduled in ${triggerList[triggerIndex]} "
+            )
             triggerIndex++
         }
         if (responseCounter.check20Met()) {
@@ -44,6 +50,7 @@ object MyDelayManager {
                 .build()
             myWorkManager.enqueue(twentyTriggerRequest)
             twentyRequestID = twentyTriggerRequest.id
+            Log.d("unlock", "a fixed trigger is scheduled in 20 sec ")
         }
         if (responseCounter.check30Met()) {
             val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
@@ -53,6 +60,7 @@ object MyDelayManager {
                 .build()
             myWorkManager.enqueue(thirtyTriggerRequest)
             thirtyRequestID = thirtyTriggerRequest.id
+            Log.d("unlock", "a fixed trigger is scheduled in 30 sec ")
         }
 
     }
@@ -79,7 +87,7 @@ object MyDelayManager {
                 != WorkInfo.State.SUCCEEDED
             ) {
                 myWorkManager.cancelWorkById(randomRequestID)
-                Log.d("unlock","a random trigger is canceled")
+                Log.d("unlock", "a random trigger is canceled")
                 recycleTrigger()
             }
         }
@@ -90,7 +98,7 @@ object MyDelayManager {
             != WorkInfo.State.SUCCEEDED
         ) {
             myWorkManager.cancelWorkById(requestID)
-            Log.d("unlock","a fixed trigger is canceled")
+            Log.d("unlock", "a fixed trigger is canceled")
         }
     }
 
@@ -99,5 +107,10 @@ object MyDelayManager {
             triggerList += triggerList[triggerIndex - 1]
             Log.d("unlock", "Trigger ${triggerList[triggerIndex - 1]} added to the list.")
         }
+    }
+
+    fun resetTriggerList() {
+        triggerList = originalTriggerList.shuffled()
+        Log.d("unlock", "trigger list is reset")
     }
 }

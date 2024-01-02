@@ -11,7 +11,7 @@ class MyWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     //    val inputData = params.inputData
     override fun doWork(): Result {
         val tag = inputData.getString("tag")
-        val serviceIntent = Intent(applicationContext, OverlayService::class.java).apply{
+        val serviceIntent = Intent(applicationContext, OverlayService::class.java).apply {
             putExtra("tag", tag)
         }
         Log.d("unlock", "triggered by $tag")

@@ -26,10 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jianzheng.studyzero.R
-import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.service.OverlayService
+import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.tool.ResponseCounter
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 
@@ -60,10 +59,12 @@ fun SettingPage(
                     .padding(mediumPadding)
             ) {
                 Text("Lock and then unlock your phone to see the floating window")
-                ShowStatus()
-                //ShowOptions()
-                ResetButton()
                 TestButton()
+                //ShowStatus()
+                //ShowOptions()
+                Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
+                ResetButton()
+
             }
         }
     }
@@ -77,6 +78,7 @@ fun ResetButton() {
     Button(
         onClick = {
             responseCounter.resetCounter()
+            MyDelayManager.resetTriggerList()
         },
     ) {
         Text(
@@ -90,7 +92,9 @@ fun ResetButton() {
 @Composable
 fun TestButton() {
     val context = LocalContext.current
-    val serviceIntent = Intent(context, OverlayService::class.java)
+    val serviceIntent = Intent(context, OverlayService::class.java).apply {
+        putExtra("tag", "testMet")
+    }
     Button(
         onClick = {
             context.startService(serviceIntent)

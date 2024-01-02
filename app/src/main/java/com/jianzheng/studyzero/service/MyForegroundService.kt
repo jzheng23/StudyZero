@@ -8,7 +8,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import androidx.core.R.drawable.notification_tile_bg
 import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import com.jianzheng.studyzero.MainActivity
@@ -79,7 +78,7 @@ class MyForegroundService : Service() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Study Zero")
             .setContentText("$count prompts completed today")
-            .setSmallIcon(notification_tile_bg) // Set an icon for the notification
+            .setSmallIcon(android.R.drawable.ic_dialog_info) // Set an icon for the notification
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build()

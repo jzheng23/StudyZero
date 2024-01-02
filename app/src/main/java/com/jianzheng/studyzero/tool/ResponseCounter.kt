@@ -35,6 +35,8 @@ class ResponseCounter(context: Context) {
         editor.putInt("20Met", 0)
             .putInt("30Met", 0)
             .putInt("randomMet", 0)
+            .putInt("testMet", 0)
             .apply()
+        Log.d("unlock", "counter of responses is reset")
     }
 }
