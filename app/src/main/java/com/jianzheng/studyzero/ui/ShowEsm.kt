@@ -85,9 +85,11 @@ fun ShowOverlay(
     handler.postDelayed({
         if (isShowing.value) {
             isShowing.value = false
-            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            windowManager.removeView(composeView)
-            context.stopService(Intent(context, OverlayService::class.java))
+            onClick()
+            MyDelayManager.recycleTrigger()
+//            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//            windowManager.removeView(composeView)
+//            context.stopService(Intent(context, OverlayService::class.java))
             Log.d("unlock","unanswered")
         }
     }, displayTimeMillis) // 10 seconds delay
