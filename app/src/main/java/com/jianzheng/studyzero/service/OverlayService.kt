@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.IBinder
-import android.util.Log
 import android.view.WindowManager
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
@@ -33,7 +32,9 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return if (intent != null) {
             unlockTime = intent.getLongExtra("unlock", 0L)
-            showOverlay()
+            var tag = intent.getStringExtra("tag")
+            if (tag == null) tag = "randomMet"
+            callOverlay(tag)
             START_STICKY
         } else {
             START_REDELIVER_INTENT
@@ -42,7 +43,7 @@ class OverlayService : Service() {
     }
 
 
-    private fun showOverlay() {
+    private fun callOverlay(tag: String = "randomMet") {
 
         val layoutFlag: Int =
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -60,6 +61,7 @@ class OverlayService : Service() {
 
         composeView.setContent {
             ShowOverlay(
+                tag = tag,
                 onClick = {
                     lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
                     windowManager.removeView(composeView)

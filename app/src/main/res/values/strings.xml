@@ -4,4 +4,7 @@
     <string name="question2">I should stop using my phone right now.</string>
     <string name="instruction">To what extent do you agree with each of the statements below?</string>
     <string name="submit">Submit</string>
+    <string name="_30met">30Met</string>
+    <string name="_20met">20Met</string>
+    <string name="random_met">randomMet</string>
 </resources>

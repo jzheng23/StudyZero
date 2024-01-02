@@ -59,6 +59,7 @@ import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
+import com.jianzheng.studyzero.tool.ResponseCounter
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun ShowOverlay(
+    tag: String,
     onClick: () -> Unit,
     lifecycleOwner: MyLifecycleOwner,
     windowManager: WindowManager,
@@ -114,6 +116,7 @@ fun ShowOverlay(
                     ) {
                         ShowEsm(myViewModel)
                         SubmitButton(
+                            tag = tag,
                             myViewModel = myViewModel,
                             isShowing = isShowing,
                             onClick = onClick,
@@ -132,6 +135,7 @@ fun ShowOverlay(
 
 @Composable
 fun SubmitButton(
+    tag: String,
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
     onClick: () -> Unit,
@@ -139,6 +143,7 @@ fun SubmitButton(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val startingTime = System.currentTimeMillis()
+    val responseCounter = ResponseCounter(context)
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -147,12 +152,11 @@ fun SubmitButton(
         onClick = {
             coroutineScope.launch(Dispatchers.IO) {
                 myViewModel.saveAnswer(startingTime)
-                Log.d("data", "coroutineScope runs")
                 val myForegroundServiceIntent = Intent(context, MyForegroundService::class.java)
                 ContextCompat.startForegroundService(context, myForegroundServiceIntent)
             }
-            Log.d("data", "Submit clicked")
             isShowing.value = false
+            responseCounter.responsePlusOne(tag)
             onClick()
         }) {
         Text(

@@ -20,17 +20,17 @@ class UnlockReceiver : BroadcastReceiver() {
 //        }
         when (intent?.action) {
             Intent.ACTION_USER_PRESENT -> {
-                val serviceIntent = Intent(context, OverlayService::class.java)
-                startTimeMillis = SystemClock.elapsedRealtime()
-                serviceIntent.putExtra("unlock", startTimeMillis)
+//                startTimeMillis = SystemClock.elapsedRealtime()
                 if (context != null) {
-                    MyDelayManager.delayService(serviceIntent, context)
+                    MyDelayManager.delayService(context)
                 }
-                unlockCounter++
+//                unlockCounter++
             }
 
             Intent.ACTION_SCREEN_OFF -> {
-                val serviceIntent = Intent(context, OverlayService::class.java)
+                val serviceIntent = Intent(context, OverlayService::class.java).apply{
+                    putExtra("tag", "none")
+                }
                 context?.stopService(serviceIntent)
                 MyDelayManager.cancelService()
             }

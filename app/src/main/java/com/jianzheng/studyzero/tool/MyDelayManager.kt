@@ -1,52 +1,67 @@
 package com.jianzheng.studyzero.tool
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.jianzheng.studyzero.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.launch
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object MyDelayManager {
-    private var job1: Job? = null
-    private var job2: Job? = null
+    private var jobRandom: Job? = null
+    private var jobTwenty: Job? = null
+    private var jobThirty: Job? = null
 
-    //    private val delayList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776, 1182, 1800)
+    //    private val delayList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
     private val triggerList = mutableListOf(1, 3, 5, 8, 12)
-    private const val extraTrigger = 1L //one minute for testing
-        private var triggerIndex: Int = 0
+    private const val extraTriggerThirty = 30L //one minute for testing
+    private const val extraTriggerTwenty = 20L
+    private var triggerIndex: Int = 0
     private var isJobScheduled = false
-    private val scope = CoroutineScope(Dispatchers.Default)
-//    private val triggerRequestList: MutableList<OneTimeWorkRequest> = mutableListOf()
-    private val extraTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
-        .setInitialDelay(extraTrigger, TimeUnit.MINUTES)
-        .build()
-
-    fun delayService(intent: Intent, context: Context) {
+//    private val scope = CoroutineScope(Dispatchers.Default)
+    private lateinit var myWorkManager: WorkManager
+    private lateinit var randomTriggerRequestID: UUID
+    
+    fun delayService(context: Context) {
         if (triggerIndex < triggerList.size) {
             isJobScheduled = true
             val triggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
                     .setInitialDelay(triggerList[triggerIndex].toLong(), TimeUnit.SECONDS)
+                    .setInputData(workDataOf("tag" to context.getString(R.string.random_met)))
                     .build()
-            Log.d("unlock", "Delay starts!")
+            val twentyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
+//        .setInitialDelay(extraTriggerTwenty, TimeUnit.MINUTES)
+                .setInitialDelay(extraTriggerTwenty, TimeUnit.SECONDS)
+                .setInputData(workDataOf("tag" to context.getString(R.string._20met)))
+                .build()
+            val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
+//        .setInitialDelay(extraTriggerThirty, TimeUnit.MINUTES)
+                .setInitialDelay(extraTriggerThirty, TimeUnit.SECONDS)
+                .setInputData(workDataOf("tag" to context.getString(R.string._30met)))
+                .build()
+            randomTriggerRequestID = triggerRequest.id
+//            Log.d("unlock", "Delay starts!")
 //            val scope = CoroutineScope(Dispatchers.Default)
-            job1 = scope.launch {
-                WorkManager.getInstance(context).enqueue(triggerRequest)
-//                delay(delayList[triggerIndex] * 1000L)
-//                context.startService(intent)
-                isJobScheduled = false
-                Log.d("unlock","index is $triggerIndex")
-            }
-            //check if the extra trigger has been met?
-            job2 = scope.launch {
-                WorkManager.getInstance(context).enqueue(extraTriggerRequest)
-            }
+//            jobRandom = scope.launch {
+//                WorkManager.getInstance(context).enqueue(triggerRequest)
+////                delay(delayList[triggerIndex] * 1000L)
+////                context.startService(intent)
+//                isJobScheduled = false
+//                Log.d("unlock","index is $triggerIndex")
+//            }
+//            //check if the extra trigger has been met?
+//            jobThirty = scope.launch {
+//                WorkManager.getInstance(context).enqueue(thirtyTriggerRequest)
+//            }
+            myWorkManager = WorkManager.getInstance(context)
+            myWorkManager.enqueue(triggerRequest)
+            myWorkManager.enqueue(twentyTriggerRequest)
+            myWorkManager.enqueue(thirtyTriggerRequest)
             triggerIndex++
 //            Log.d("unlock","unlocked $triggerIndex times")
         } else {
@@ -57,16 +72,15 @@ object MyDelayManager {
 
     fun cancelService() {
 
-        scope.coroutineContext.cancelChildren()
-//        Log.d("unlock","Job cancelled!")
-//        job1?.cancel()
-//        job2?.cancel()
-        if (isJobScheduled) {
-            recycleTrigger()
-            Log.d("unlock", "Job cancelled! Len of list is ${triggerList.size}")
-        } else {
-            Log.d("unlock", "Nothing to cancel")
-        }
+        myWorkManager.cancelWorkById(randomTriggerRequestID)
+
+//        scope.coroutineContext.cancelChildren()
+//        if (isJobScheduled) {
+//            recycleTrigger()
+//            Log.d("unlock", "Job cancelled! Len of list is ${triggerList.size}")
+//        } else {
+//            Log.d("unlock", "Nothing to cancel")
+//        }
     }
 
     fun recycleTrigger() {

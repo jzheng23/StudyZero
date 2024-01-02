@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
         // Put values
         editor.putString("example_key", "Hello, SharedPreferences!")
             .putBoolean("first_run",false)
-            .putInt("some_int",0)
+            .putBoolean("twentyMet",false)
+            .putInt("thirtyMet",0)
             .apply()
     }
 
