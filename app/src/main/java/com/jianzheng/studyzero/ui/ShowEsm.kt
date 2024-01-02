@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -69,13 +70,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ShowOverlay(
     tag: String,
-    onClick: () -> Unit,
-    lifecycleOwner: MyLifecycleOwner,
-    windowManager: WindowManager,
-    composeView: ComposeView,
-    context: Context
+    onClick: () -> Unit
 ) {
-    val db = Room.databaseBuilder(context, EsmDatabase::class.java, "response_database").build()
+    val db = Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database").build()
     val responseDao = db.responseDao()
     val myViewModel = EsmViewModel(responseDao)
     val isShowing = remember { mutableStateOf(true) }
@@ -121,8 +118,7 @@ fun ShowOverlay(
                             tag = tag,
                             myViewModel = myViewModel,
                             isShowing = isShowing,
-                            onClick = onClick,
-                            context = context
+                            onClick = onClick
                         )
                     }
                     DismissButton(
@@ -141,10 +137,10 @@ fun SubmitButton(
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
     onClick: () -> Unit,
-    context: Context
 ) {
     val coroutineScope = rememberCoroutineScope()
     val startingTime = System.currentTimeMillis()
+    val context = LocalContext.current
     val responseCounter = ResponseCounter(context)
     Button(
         modifier = Modifier

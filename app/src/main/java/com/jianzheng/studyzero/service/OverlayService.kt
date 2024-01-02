@@ -66,11 +66,7 @@ class OverlayService : Service() {
                     lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
                     windowManager.removeView(composeView)
                     stopSelf()
-                },
-                lifecycleOwner = lifecycleOwner,
-                windowManager = windowManager,
-                composeView = composeView,
-                context = this
+                }
             )
         }
 
