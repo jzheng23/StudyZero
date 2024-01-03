@@ -15,20 +15,20 @@ class ResponseCounter(context: Context) {
         Log.d("unlock", "$tag is ${retrievedValue + 1}")
     }
 
-    fun check20Met(): Boolean {
-        return sharedPreferences.getInt("20Met", 0) < 1
+    fun check20Complete(): Boolean {
+        return sharedPreferences.getInt("20Met", 0) >= 1
     }
 
-    fun check30Met(): Boolean {
-        return sharedPreferences.getInt("30Met", 0) < 2
+    fun check30Complete(): Boolean {
+        return sharedPreferences.getInt("30Met", 0) >= 2
     }
 
-    fun checkRandomMet(): Boolean {
-        return sharedPreferences.getInt("randomMet", 0) < lengthOfTriggerList
+    fun checkRandomComplete(): Boolean {
+        return sharedPreferences.getInt("randomMet", 0) >= lengthOfTriggerList
     }
 
     fun checkComplete(): Boolean {
-        return (checkRandomMet() and check20Met() and check30Met())
+        return (checkRandomComplete() and check20Complete() and check30Complete())
     }
 
     fun resetCounter() {

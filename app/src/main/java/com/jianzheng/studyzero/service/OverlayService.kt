@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.IBinder
+import android.util.Log
 import android.view.WindowManager
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
@@ -27,6 +28,7 @@ class OverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
         setTheme(R.style.Theme_StudyZero)
+        Log.d("unlock","OverlayService OnCreate")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -35,8 +37,10 @@ class OverlayService : Service() {
             var tag = intent.getStringExtra("tag")
             if (tag == null) tag = "randomMet"
             callOverlay(tag)
+            Log.d("unlock","OverlayService OnStartCommand with Intent: $intent")
             START_STICKY
         } else {
+            Log.d("unlock","OverlayService OnStartCommand without Intent")
             START_REDELIVER_INTENT
         }
         // Your service logic here
@@ -83,7 +87,7 @@ class OverlayService : Service() {
         // This is required or otherwise the UI will not recompose
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-
+        if (composeView.isAttachedToWindow) windowManager.removeView(composeView)
         windowManager.addView(composeView, params)
     }
 
@@ -94,8 +98,8 @@ class OverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        windowManager.removeView(composeView)
-//        Log.d("unlock","OverlayService OnDestroy")
+        if (composeView.isAttachedToWindow) windowManager.removeView(composeView)
+        Log.d("unlock","OverlayService OnDestroy")
     }
 
 }

@@ -60,7 +60,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun ShowOverlay(
     tag: String,
@@ -77,10 +76,7 @@ fun ShowOverlay(
         if (autoDismiss.value) {
             autoDismiss.value = false
             onClick()
-            MyDelayManager.recycleTrigger()
-//            lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-//            windowManager.removeView(composeView)
-//            context.stopService(Intent(context, OverlayService::class.java))
+            if (tag == "randomMet") MyDelayManager.recycleTrigger()
             Log.d("unlock","unanswered")
         }
     }, displayTimeMillis) // 10 seconds delay
@@ -97,9 +93,9 @@ fun ShowOverlay(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(mediumPadding),
-                onClick = {
-                    autoDismiss.value = false
-                },
+//                onClick = {
+//                    autoDismiss.value = false
+//                },
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
             ) {
@@ -306,7 +302,7 @@ fun ChoiceWithLabel(
             onClick =
             {
                 selectedValue.value = item
-                autoDismiss.value = false
+//                autoDismiss.value = false
                 myViewModel.setAnswer(item, index)
                 Log.d("viewModel", "$item selected for q$index!")
             },

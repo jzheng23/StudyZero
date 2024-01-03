@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 object MyDelayManager {
     //    private val originalTriggerList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
-    private var originalTriggerList = mutableListOf(1, 5, 12)
+    private var originalTriggerList = mutableListOf(1, 5, 8)
     private var triggerList = originalTriggerList.shuffled()
 
     private const val extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
@@ -29,7 +29,7 @@ object MyDelayManager {
     fun delayService(context: Context) {
         myWorkManager = WorkManager.getInstance(context)
         val responseCounter = ResponseCounter(context)
-        if (responseCounter.checkRandomMet()) {
+        if (!responseCounter.checkRandomComplete()) {
             val triggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
                 .setInitialDelay(triggerList[triggerIndex].toLong(), TimeUnit.SECONDS)
                 .setInputData(workDataOf("tag" to context.getString(R.string.random_met)))
@@ -42,7 +42,7 @@ object MyDelayManager {
             )
             triggerIndex++
         }
-        if (responseCounter.check20Met()) {
+        if (!responseCounter.check20Complete()) {
             val twentyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
 //                .setInitialDelay(extraTriggerTwenty, TimeUnit.MINUTES)
                 .setInitialDelay(extraTriggerTwenty, TimeUnit.SECONDS)
@@ -51,8 +51,7 @@ object MyDelayManager {
             myWorkManager.enqueue(twentyTriggerRequest)
             twentyRequestID = twentyTriggerRequest.id
             Log.d("unlock", "a fixed trigger is scheduled in 20 sec ")
-        }
-        if (responseCounter.check30Met()) {
+        } else if (!responseCounter.check30Complete()) {
             val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
 //                .setInitialDelay(extraTriggerThirty, TimeUnit.MINUTES)
                 .setInitialDelay(extraTriggerThirty, TimeUnit.SECONDS)
@@ -62,7 +61,6 @@ object MyDelayManager {
             thirtyRequestID = thirtyTriggerRequest.id
             Log.d("unlock", "a fixed trigger is scheduled in 30 sec ")
         }
-
     }
 
 
