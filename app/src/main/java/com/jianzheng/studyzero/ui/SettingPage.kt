@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import com.jianzheng.studyzero.R
 import com.jianzheng.studyzero.service.OverlayService
 import com.jianzheng.studyzero.tool.MyDelayManager
@@ -64,11 +66,29 @@ fun SettingPage(
                 //ShowOptions()
                 Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
                 ResetButton()
+//                TestFirebaseButton()
 
             }
         }
     }
 
+}
+
+@Composable
+fun TestFirebaseButton() {
+    Button(
+        onClick = {
+            // Write a message to the database
+            val database = Firebase.database
+            val myRef = database.getReference("message")
+            myRef.setValue("Hello, World!")
+        }
+    ){
+        Text(
+            text = "Test Firebase",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 @Composable

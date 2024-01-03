@@ -33,7 +33,8 @@ class OverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return if (intent != null) {
-            unlockTime = intent.getLongExtra("unlock", 0L)
+            unlockTime = intent.getLongExtra("unlock", System.currentTimeMillis())
+            Log.d("delayTime","received: $unlockTime")
             var tag = intent.getStringExtra("tag")
             if (tag == null) tag = "randomMet"
             callOverlay(tag)
@@ -66,6 +67,7 @@ class OverlayService : Service() {
         composeView.setContent {
             ShowOverlay(
                 tag = tag,
+                unlockTime = unlockTime,
                 onClick = {
 //                    lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 //                    windowManager.removeView(composeView)

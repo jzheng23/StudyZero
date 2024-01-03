@@ -2,6 +2,7 @@ package com.jianzheng.studyzero.ui
 
 import android.util.Log
 import com.jianzheng.studyzero.data.EsmUiState
+import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.data.ResponseDao
 import com.jianzheng.studyzero.data.toResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +28,18 @@ class EsmViewModel(
         }
     }
 
-    suspend fun saveAnswer(startingTime: Long){
-        responseDao.insert(uiState.value.toResponse(startingTime))
+    suspend fun saveAnswer(delay: Long, startingTime: Long){
+        val newResponse = uiState.value.toResponse(delay, startingTime)
+        responseDao.insert(newResponse)
+        uploadToFirebase(newResponse)
         Log.d("data","data saved")
     }
+
+    private fun uploadToFirebase(newResponse: Response) {
+
+
+    }
+
     fun getAnswer(index: Int): Int {
         return uiState.value.answer[index]
     }

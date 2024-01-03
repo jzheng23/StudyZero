@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "303189353965",
+    "firebase_url": "https://psu0-8286d-default-rtdb.firebaseio.com",
+    "project_id": "psu0-8286d",
+    "storage_bucket": "psu0-8286d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:303189353965:android:841be54507d33929a1b3e4",
+        "android_client_info": {
+          "package_name": "com.jianzheng.studyzero"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd9Lu5vX9nmbx1HbXLW_Wu8mVDIMFyrL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

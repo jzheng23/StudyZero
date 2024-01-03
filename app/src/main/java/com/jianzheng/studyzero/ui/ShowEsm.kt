@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ShowOverlay(
     tag: String,
+    unlockTime: Long,
     onClick: () -> Unit
 ) {
     val db =
@@ -110,6 +111,7 @@ fun ShowOverlay(
                     )
                     SubmitButton(
                         tag = tag,
+                        unlockTime = unlockTime,
                         myViewModel = myViewModel,
                         isShowing = autoDismiss,
                         onClick = onClick
@@ -123,12 +125,15 @@ fun ShowOverlay(
 @Composable
 fun SubmitButton(
     tag: String,
+    unlockTime: Long,
     myViewModel: EsmViewModel,
     isShowing: MutableState<Boolean>,
     onClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val startingTime = System.currentTimeMillis()
+    Log.d("delayTime","displaying: ${System.currentTimeMillis()}")
+    val delay = startingTime - unlockTime
     val context = LocalContext.current
     val responseCounter = ResponseCounter(context)
     Button(
@@ -138,7 +143,7 @@ fun SubmitButton(
         enabled = myViewModel.uiState.collectAsState().value.isAnswerValid,
         onClick = {
             coroutineScope.launch(Dispatchers.IO) {
-                myViewModel.saveAnswer(startingTime)
+                myViewModel.saveAnswer(delay, startingTime)
                 val myForegroundServiceIntent = Intent(context, MyForegroundService::class.java)
                 ContextCompat.startForegroundService(context, myForegroundServiceIntent)
             }
