@@ -68,7 +68,7 @@ fun ShowOverlay(
         Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database")
             .build()
     val responseDao = db.responseDao()
-    val myViewModel = EsmViewModel(responseDao)
+    val myViewModel = EsmViewModel(responseDao, LocalContext.current)
     val autoDismiss = remember { mutableStateOf(true) }
     //TODO need to tidy up
     val handler = Handler(Looper.myLooper()!!)

@@ -1,11 +1,15 @@
 package com.jianzheng.studyzero.ui
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import com.jianzheng.studyzero.data.EsmUiState
 import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.data.ResponseDao
+import com.jianzheng.studyzero.data.ResponseNoId
 import com.jianzheng.studyzero.data.toResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,12 +17,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class EsmViewModel(
-    private val responseDao: ResponseDao
+    private val responseDao: ResponseDao,
+    val context: Context
 ) {
     private val _uiState = MutableStateFlow(EsmUiState(listOf(0, 0), false))
     val uiState: StateFlow<EsmUiState> = _uiState.asStateFlow()
     private val database = Firebase.database
     private val myRef = database.getReference("ESM")
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
 
     fun setAnswer(selection: Int, index: Int) {
         val updatedAnswers = uiState.value.answer.toMutableList()
@@ -40,7 +47,8 @@ class EsmViewModel(
     }
 
     private fun uploadToFirebase(newResponse: Response) {
-        myRef.setValue(newResponse)
+        val uid = sharedPreferences.getInt("UID", 0)
+        myRef.child(uid.toString()).child(newResponse.id.toString()).setValue(ResponseNoId.fromResponse(newResponse))
     }
 
     fun getAnswer(index: Int): Int {
