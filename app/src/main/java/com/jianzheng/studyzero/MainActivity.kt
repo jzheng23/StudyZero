@@ -20,6 +20,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     private val unlockReceiver = UnlockReceiver()
@@ -58,11 +59,14 @@ class MainActivity : ComponentActivity() {
             responseDao.insert(Response(id = 1, delay = 0, answer1 = 9, answer2 = 9, startingTime = 0, submittingTime = 0))
         }
 
-        createSharedPreference()
+        val sharedPreferences =
+            this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+        if (sharedPreferences.getBoolean("first_run", true)) createSharedPreference()
     }
 
     private fun createSharedPreference() {
         val sharedPreferences = getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+        val randomInt = Random.nextInt()
 
         // Open the editor to make changes
         val editor = sharedPreferences.edit()
@@ -70,8 +74,7 @@ class MainActivity : ComponentActivity() {
         // Put values
         editor.putString("example_key", "Hello, SharedPreferences!")
             .putBoolean("first_run",false)
-            .putBoolean("twentyMet",false)
-            .putInt("thirtyMet",0)
+            .putInt("UID", randomInt)
             .apply()
     }
 

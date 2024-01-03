@@ -1,6 +1,8 @@
 package com.jianzheng.studyzero.ui
 
 import android.util.Log
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import com.jianzheng.studyzero.data.EsmUiState
 import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.data.ResponseDao
@@ -15,6 +17,8 @@ class EsmViewModel(
 ) {
     private val _uiState = MutableStateFlow(EsmUiState(listOf(0, 0), false))
     val uiState: StateFlow<EsmUiState> = _uiState.asStateFlow()
+    private val database = Firebase.database
+    private val myRef = database.getReference("ESM")
 
     fun setAnswer(selection: Int, index: Int) {
         val updatedAnswers = uiState.value.answer.toMutableList()
@@ -31,13 +35,12 @@ class EsmViewModel(
     suspend fun saveAnswer(delay: Long, startingTime: Long){
         val newResponse = uiState.value.toResponse(delay, startingTime)
         responseDao.insert(newResponse)
-        uploadToFirebase(newResponse)
+        uploadToFirebase(responseDao.getLastResponse())
         Log.d("data","data saved")
     }
 
     private fun uploadToFirebase(newResponse: Response) {
-
-
+        myRef.setValue(newResponse)
     }
 
     fun getAnswer(index: Int): Int {

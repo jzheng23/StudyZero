@@ -18,4 +18,7 @@ interface ResponseDao {
     @Query("SELECT COUNT(id) from responses WHERE submittingTime > :todayInMillis")
     fun getCountToday(todayInMillis: Long): Flow<Int>
 
+    @Query("SELECT * FROM responses WHERE id = (SELECT MAX(id) FROM responses)")
+    fun getLastResponse(): Response
+
 }
