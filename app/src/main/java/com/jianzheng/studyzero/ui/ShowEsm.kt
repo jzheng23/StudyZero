@@ -63,7 +63,9 @@ fun ShowOverlay(
     tag: String,
     onClick: () -> Unit
 ) {
-    val db = Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database").build()
+    val db =
+        Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database")
+            .build()
     val responseDao = db.responseDao()
     val myViewModel = EsmViewModel(responseDao)
     val autoDismiss = remember { mutableStateOf(true) }
@@ -75,7 +77,7 @@ fun ShowOverlay(
             autoDismiss.value = false
             onClick()
             if (tag == "randomMet") MyDelayManager.recycleTrigger()
-            Log.d("unlock","unanswered")
+            Log.d("unlock", "unanswered")
         }
     }, displayTimeMillis) // 10 seconds delay
 
@@ -154,7 +156,7 @@ fun SubmitButton(
 @Composable
 fun ShowEsm(
     myViewModel: EsmViewModel,
-    autoDismiss: MutableState<Boolean> ,
+    autoDismiss: MutableState<Boolean>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -166,7 +168,7 @@ fun ShowEsm(
             .background(color = MaterialTheme.colorScheme.surface)
             .padding(vertical = mediumPadding)
     ) {
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier
@@ -197,7 +199,7 @@ fun ShowEsm(
 
 @Composable
 fun ShowInstruction(
-    modifier:Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         stringResource(R.string.instruction),
