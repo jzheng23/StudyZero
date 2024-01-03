@@ -1,6 +1,5 @@
 package com.jianzheng.studyzero.ui
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -39,16 +38,17 @@ class EsmViewModel(
         }
     }
 
-    suspend fun saveAnswer(delay: Long, startingTime: Long){
+    suspend fun saveAnswer(delay: Long, startingTime: Long) {
         val newResponse = uiState.value.toResponse(delay, startingTime)
         responseDao.insert(newResponse)
         uploadToFirebase(responseDao.getLastResponse())
-        Log.d("data","data saved")
+        Log.d("data", "data saved")
     }
 
     private fun uploadToFirebase(newResponse: Response) {
         val uid = sharedPreferences.getInt("UID", 0)
-        myRef.child(uid.toString()).child(newResponse.id.toString()).setValue(ResponseNoId.fromResponse(newResponse))
+        myRef.child(uid.toString()).child(newResponse.id.toString())
+            .setValue(ResponseNoId.fromResponse(newResponse))
     }
 
     fun getAnswer(index: Int): Int {

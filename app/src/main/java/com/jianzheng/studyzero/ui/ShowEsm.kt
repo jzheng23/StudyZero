@@ -106,7 +106,7 @@ fun ShowOverlay(
                 ) {
                     ShowEsm(
                         myViewModel = myViewModel,
-                        autoDismiss = autoDismiss,
+//                        autoDismiss = autoDismiss,
                         onClick = onClick
                     )
                     SubmitButton(
@@ -161,7 +161,7 @@ fun SubmitButton(
 @Composable
 fun ShowEsm(
     myViewModel: EsmViewModel,
-    autoDismiss: MutableState<Boolean>,
+//    autoDismiss: MutableState<Boolean>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -191,13 +191,13 @@ fun ShowEsm(
             questionString = R.string.question1,
             index = 0,
             myViewModel = myViewModel,
-            autoDismiss = autoDismiss
+//            autoDismiss = autoDismiss
         )
         ShowQuestion(
             questionString = R.string.question2,
             index = 1,
             myViewModel = myViewModel,
-            autoDismiss = autoDismiss
+//            autoDismiss = autoDismiss
         )
     }
 }
@@ -234,7 +234,7 @@ fun ShowQuestion(
     modifier: Modifier = Modifier,
     index: Int,
     myViewModel: EsmViewModel,
-    autoDismiss: MutableState<Boolean>
+//    autoDismiss: MutableState<Boolean>
 ) {
     val options: List<Int> = listOf(1, 2, 3, 4, 5)
     val labels: List<String> = listOf("Strongly disagree", "", "Neutral", "", "Strongly agree")
@@ -283,7 +283,7 @@ fun ShowQuestion(
                         label = labels[item - 1],
                         index = index,
                         myViewModel = myViewModel,
-                        autoDismiss = autoDismiss,
+//                        autoDismiss = autoDismiss,
                         selectedValue = selectedValue
                     )
                 }
@@ -299,7 +299,7 @@ fun ChoiceWithLabel(
     index: Int,
     myViewModel: EsmViewModel,
     selectedValue: MutableState<Int>,
-    autoDismiss: MutableState<Boolean>,
+//    autoDismiss: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
     Column(
