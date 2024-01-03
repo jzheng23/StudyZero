@@ -6,7 +6,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +21,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -57,7 +55,6 @@ import com.jianzheng.studyzero.service.MyForegroundService
 import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.tool.ResponseCounter
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -100,25 +97,20 @@ fun ShowOverlay(
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
             ) {
-
-                Box {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        ShowEsm(
-                            myViewModel,
-                            autoDismiss)
-                        SubmitButton(
-                            tag = tag,
-                            myViewModel = myViewModel,
-                            isShowing = autoDismiss,
-                            onClick = onClick
-                        )
-                    }
-                    DismissButton(
-                        onDismiss = onClick,
-                        modifier = Modifier.align(Alignment.TopEnd)
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ShowEsm(
+                        myViewModel = myViewModel,
+                        autoDismiss = autoDismiss,
+                        onClick = onClick
+                    )
+                    SubmitButton(
+                        tag = tag,
+                        myViewModel = myViewModel,
+                        isShowing = autoDismiss,
+                        onClick = onClick
                     )
                 }
             }
@@ -163,6 +155,7 @@ fun SubmitButton(
 fun ShowEsm(
     myViewModel: EsmViewModel,
     autoDismiss: MutableState<Boolean> ,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val mediumPadding = dimensionResource(id = R.dimen.padding_medium)
@@ -173,7 +166,19 @@ fun ShowEsm(
             .background(color = MaterialTheme.colorScheme.surface)
             .padding(vertical = mediumPadding)
     ) {
-        ShowInstruction()
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier
+                .padding(horizontal = mediumPadding / 2)
+
+        ) {
+            ShowInstruction(modifier = Modifier.weight(1f))
+            DismissButton(
+                onDismiss = onClick,
+                modifier = Modifier.width(40.dp)
+            )
+        }
         //show question 1
         ShowQuestion(
             questionString = R.string.question1,
@@ -191,7 +196,9 @@ fun ShowEsm(
 }
 
 @Composable
-fun ShowInstruction() {
+fun ShowInstruction(
+    modifier:Modifier = Modifier
+) {
     Text(
         stringResource(R.string.instruction),
         textAlign = TextAlign.Center,
@@ -209,13 +216,8 @@ fun ShowInstruction() {
                 )
             )
         ),
-        modifier = Modifier
-            .padding(
-                top = mediumPadding * 3,
-                bottom = mediumPadding / 2,
-                start = mediumPadding / 2,
-                end = mediumPadding / 2
-            )
+        modifier = modifier
+            .padding(top = mediumPadding / 2)
     )
 }
 

@@ -60,18 +60,12 @@ fun ShowOverlayPreview() {
                 elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation)),
                 shape = RoundedCornerShape(20.dp)
             ) {
-                Box {
-                    DismissButton(
-                        onDismiss = { },
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        ShowEsmPreview()
-                        SubmitButtonPreview()
-                    }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ShowEsmPreview()
+                    SubmitButtonPreview()
                 }
             }
         }
@@ -104,7 +98,16 @@ fun ShowEsmPreview(modifier: Modifier = Modifier) {
             .background(color = MaterialTheme.colorScheme.surface)
             .padding(vertical = mediumPadding)
     ) {
-        ShowInstruction()
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ShowInstruction()
+            DismissButton(
+                onDismiss = { },
+                modifier = modifier
+            )
+        }
         //show question 1
         ShowQuestionPreview(
             questionString = R.string.question1,
