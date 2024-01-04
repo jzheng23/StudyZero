@@ -7,7 +7,10 @@ class ResponseCounter(context: Context) {
     private val sharedPreferences =
         context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     private val editor = sharedPreferences.edit()
-    private val lengthOfTriggerList = 3 //13 for real, 3 for testing
+    private val lengthOfTriggerList = if (
+        sharedPreferences.getBoolean("using_testing_triggers", true)
+    ) 3 else 13//13 for real, 3 for testing
+
     fun responsePlusOne(tag: String) {
         val retrievedValue = sharedPreferences.getInt(tag, 0)
         editor.putInt(tag, retrievedValue + 1)
@@ -24,6 +27,7 @@ class ResponseCounter(context: Context) {
     }
 
     fun checkRandomComplete(): Boolean {
+        Log.d("testing","length of random trigger: $lengthOfTriggerList")
         return sharedPreferences.getInt("randomMet", 0) >= lengthOfTriggerList
     }
 

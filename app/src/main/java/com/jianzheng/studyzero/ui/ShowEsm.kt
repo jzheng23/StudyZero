@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
@@ -64,15 +65,20 @@ fun ShowOverlay(
     unlockTime: Long,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val db =
-        Room.databaseBuilder(LocalContext.current, EsmDatabase::class.java, "response_database")
+        Room.databaseBuilder(context, EsmDatabase::class.java, "response_database")
             .build()
     val responseDao = db.responseDao()
-    val myViewModel = EsmViewModel(responseDao, LocalContext.current)
+    val myViewModel = EsmViewModel(responseDao, context)
     val autoDismiss = remember { mutableStateOf(true) }
     //TODO need to tidy up
     val handler = Handler(Looper.myLooper()!!)
-    val displayTimeMillis = 10000L //10 seconds for testing, 30 seconds for real data collection
+    val sharedPreferences =
+        context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+    val displayTimeMillis = if (
+        sharedPreferences.getBoolean("using_testing_triggers", true)
+        ) 10000L else 30000L //10 seconds for testing, 30 seconds for real data collection
     handler.postDelayed({
         if (autoDismiss.value) {
             autoDismiss.value = false

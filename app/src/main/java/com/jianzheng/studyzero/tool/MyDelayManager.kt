@@ -14,17 +14,36 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object MyDelayManager {
-    //    private val originalTriggerList = listOf<Int>(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
-    private var originalTriggerList = mutableListOf(1, 5, 8)
-    private var triggerList = originalTriggerList.shuffled()
-
-    private const val extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
-    private const val extraTriggerTwenty = 20L
+    private val longTriggerList = mutableListOf(5, 8, 12, 18, 27, 41, 62, 95, 144, 220, 335, 510, 776)
+    private val shortTriggerList = mutableListOf(1, 5, 8)
+    private lateinit var originalTriggerList: MutableList<Int>
+    private lateinit var triggerList : MutableList<Int>
+    private var extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
+    private var extraTriggerTwenty = 20L
     private var triggerIndex: Int = 0
     private lateinit var myWorkManager: WorkManager
     private lateinit var randomRequestID: UUID
     private lateinit var twentyRequestID: UUID
     private lateinit var thirtyRequestID: UUID
+
+    fun init(context: Context){
+        val sharedPreferences =
+            context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+        if (
+            sharedPreferences.getBoolean("using_testing_triggers", true)
+        ) {//testing
+            originalTriggerList = shortTriggerList
+            extraTriggerThirty = 30L //30 minutes for real 30 seconds for testing
+            extraTriggerTwenty = 20L
+        }
+        else {//not testing
+            originalTriggerList = longTriggerList
+            extraTriggerThirty = 30L * 60 //30 minutes for real 30 seconds for testing
+            extraTriggerTwenty = 20L * 60
+        }
+        triggerList = originalTriggerList.shuffled().toMutableList()
+        Log.d("testing", "init length of trigger list: ${triggerList.size}")
+    }
 
     fun delayService(context: Context) {
         myWorkManager = WorkManager.getInstance(context)
@@ -110,7 +129,7 @@ object MyDelayManager {
     }
 
     fun resetTriggerList() {
-        triggerList = originalTriggerList.shuffled()
+        triggerList = originalTriggerList.shuffled().toMutableList()
         Log.d("unlock", "trigger list is reset")
     }
 }

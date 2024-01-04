@@ -63,11 +63,11 @@ fun SettingPage(
         } else {
             PermissionSetting(userId)
         }
-//        TestingPage(
-//            userId = userId,
-//            modifier = modifier,
-//            showDialog = showDialog
-//        )
+        TestingPage(
+            userId = userId,
+            modifier = modifier,
+            showDialog = showDialog
+        )
     }
 
 }

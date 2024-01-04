@@ -13,6 +13,7 @@ import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.service.MyForegroundService
+import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.tool.MyPermissionManager
 import com.jianzheng.studyzero.ui.SettingPage
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
@@ -52,16 +53,18 @@ class MainActivity : ComponentActivity() {
         ContextCompat.startForegroundService(this, myForegroundServiceIntent)
 
         //start room TODO maybe not needed?
-        val db = Room.databaseBuilder(applicationContext, EsmDatabase::class.java,"response_database").build()
-        val responseDao = db.responseDao()
-        GlobalScope.launch(Dispatchers.IO) {
-            responseDao.insert(Response(id = 1, delay = 0, answer1 = 9, answer2 = 9, startingTime = 0, submittingTime = 0))
-        }
+//        val db = Room.databaseBuilder(applicationContext, EsmDatabase::class.java,"response_database").build()
+//        val responseDao = db.responseDao()
+//        GlobalScope.launch(Dispatchers.IO) {
+//            responseDao.insert(Response(id = 1, delay = 0, answer1 = 9, answer2 = 9, startingTime = 0, submittingTime = 0))
+//        }
 
         //init sharedPreference, TODO maybe not needed?
         val sharedPreferences =
             this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
         if (sharedPreferences.getBoolean("first_run", true)) createSharedPreference()
+
+        MyDelayManager.init(this)
     }
 
     private fun createSharedPreference() {
