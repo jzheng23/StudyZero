@@ -1,5 +1,6 @@
 package com.jianzheng.studyzero.ui
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -25,8 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import com.jianzheng.studyzero.R
@@ -43,6 +49,10 @@ fun SettingPage(
     modifier: Modifier = Modifier
 ) {
     val showDialog = remember { mutableStateOf(false) }
+    val showLoginButton = remember { mutableStateOf(true) }
+    val sharedPreferences =
+        LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+    val userId = sharedPreferences.getString("UID", "null")
     LoginPage(showDialog)
     Column(
         modifier = Modifier
@@ -51,40 +61,70 @@ fun SettingPage(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            modifier = Modifier.padding(16.dp),
-            shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier
-                    .padding(mediumPadding)
-            ) {
-                Text("Lock and then unlock your phone to see the floating window")
-                TestButton()
-                //ShowStatus()
-                //ShowOptions()
-                Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
-                ResetButton()
-//                TestFirebaseButton()
-                Text("Please login")
-                LoginButton(showDialog)
-
-            }
+        if (showLoginButton.value) {
+            Text("Please login")
+            LoginButton(
+                showLoginButton = showLoginButton,
+                showDialog = showDialog
+            )
         }
+        testingPage(
+            userId = userId,
+            modifier = modifier,
+            showLoginButton = showLoginButton,
+            showDialog = showDialog
+        )
     }
 
+}
+@Composable
+fun testingPage(
+    userId: String?,
+    modifier: Modifier,
+    showLoginButton: MutableState<Boolean>,
+    showDialog: MutableState<Boolean>
+) {
+    Card(
+        modifier = Modifier.padding(16.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier
+                .padding(mediumPadding)
+        ) {
+            Text(
+                text = "Only for testing",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
+            Text("User ID is $userId")
+            Text("Lock and then unlock your phone to see the floating window")
+            TestButton()
+            //ShowStatus()
+            //ShowOptions()
+            Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
+            ResetButton()
+//                TestFirebaseButton()
+            LoginButton(
+                showLoginButton = showLoginButton,
+                showDialog = showDialog)
+
+        }
+    }
 }
 
 @Composable
 fun LoginButton(
+    showLoginButton: MutableState<Boolean>,
     showDialog: MutableState<Boolean>
 ) {
     Button(
         onClick = {
             showDialog.value = true
+            showLoginButton.value = false
         }
     ){
         Text("Login")
@@ -205,3 +245,27 @@ fun PreviewSetting() {
     }
 }
 
+@Composable
+fun AuthCard(
+    title: String,
+    desc: String,
+    onAuthClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.padding(10.dp, 5.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title, fontSize = 18.sp
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = desc, fontSize = 14.sp
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        OutlinedButton(onClick = onAuthClick) {
+            Text(text = "授权")
+        }
+    }
+}
