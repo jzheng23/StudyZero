@@ -52,8 +52,10 @@ fun SettingPage(
     val showLoginButton = remember { mutableStateOf(true) }
     val sharedPreferences =
         LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
-    val userId = sharedPreferences.getString("UID", "null")
-    LoginPage(showDialog)
+    val userId = remember {
+        mutableStateOf(sharedPreferences.getString("UID", "null"))
+    }
+    if (showDialog.value) LoginPage(userId,showDialog)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +63,7 @@ fun SettingPage(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (showLoginButton.value) {
+        if (showLoginButton.value and (userId.value == "null")) {
             Text("Please login")
             LoginButton(
                 showLoginButton = showLoginButton,
@@ -79,7 +81,7 @@ fun SettingPage(
 }
 @Composable
 fun testingPage(
-    userId: String?,
+    userId: MutableState<String?>,
     modifier: Modifier,
     showLoginButton: MutableState<Boolean>,
     showDialog: MutableState<Boolean>
@@ -100,7 +102,7 @@ fun testingPage(
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
-            Text("User ID is $userId")
+            Text("User ID is ${userId.value}")
             Text("Lock and then unlock your phone to see the floating window")
             TestButton()
             //ShowStatus()
@@ -108,10 +110,10 @@ fun testingPage(
             Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
             ResetButton()
 //                TestFirebaseButton()
+            Text("Change user ID")
             LoginButton(
                 showLoginButton = showLoginButton,
                 showDialog = showDialog)
-
         }
     }
 }
@@ -129,7 +131,6 @@ fun LoginButton(
     ){
         Text("Login")
     }
-
 }
 
 @Composable

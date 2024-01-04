@@ -16,10 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,62 +28,71 @@ import androidx.compose.ui.window.Dialog
 @Preview
 @Composable
 fun LoginPage(
+    userId: MutableState<String?> = mutableStateOf("null"),
     showDialog: MutableState<Boolean> = mutableStateOf(true)
 ) {
-    if (showDialog.value) {
-        Dialog(
-            onDismissRequest = {
-                showDialog.value = false
-            }
-        ){
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
+    Dialog(
+        onDismissRequest = {
+            showDialog.value = false
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    UseIdInputField(showDialog)
-                }
+                UseIdInputField(
+                    userId,
+                    showDialog
+                )
             }
-
         }
     }
-
 }
 
-fun saveUserId(userId: String, context: Context) {
-    val userIdIsValidate: Boolean = validateUid(userId)
+fun saveUserId(
+    userId: MutableState<String?>,
+    context: Context
+) {
+    val userIdIsValidate: Boolean = validateUid(userId.value)
     val sharedPreferences =
         context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
-    editor.putString("UID", userId)
+    editor.putString("UID", userId.value)
         .putBoolean("UID_valid", userIdIsValidate)
         .apply()
-    Log.d("userId","UID is $userId, and it is $userIdIsValidate")
+    Log.d("userId", "UID is ${userId.value}, and it is $userIdIsValidate")
 }
 
-fun validateUid(userId: String): Boolean {
+fun validateUid(userId: String?): Boolean {
     val pattern = "^[A-Za-z]{2}\\d{3}$"
     // Step 2: Compile the regex
     val regex = pattern.toRegex()
     // Step 3: Check the string
-    return regex.matches(userId)
+    return if (userId == null) {
+        false
+    } else {
+        regex.matches(userId)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UseIdInputField(
+    userId: MutableState<String?>,
     showDialog: MutableState<Boolean>
 ) {
-    var userId by remember { mutableStateOf("") }
+    //var userId by remember { mutableStateOf("") }
     val context = LocalContext.current
-    TextField(
-        value = userId,
-        onValueChange = { userId = it },
+    userId.value?.let { it ->
+        TextField(
+        value = it,
+        onValueChange = { userId.value = it },
         label = { Text("User ID") },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -102,6 +108,7 @@ fun UseIdInputField(
             }
         )
     )
+    }
     Button(
         onClick = {
             showDialog.value = false
@@ -110,7 +117,7 @@ fun UseIdInputField(
                 context
             )
         }
-    ){
+    ) {
         Text("Confirm")
     }
 }
