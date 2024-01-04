@@ -66,7 +66,6 @@ class MainActivity : ComponentActivity() {
 
     private fun createSharedPreference() {
         val sharedPreferences = getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
-        val randomInt = Random.nextInt()
 
         // Open the editor to make changes
         val editor = sharedPreferences.edit()
@@ -74,7 +73,7 @@ class MainActivity : ComponentActivity() {
         // Put values
         editor.putString("example_key", "Hello, SharedPreferences!")
             .putBoolean("first_run",false)
-            .putInt("UID", randomInt)
+            .putString("UID", "null")
             .apply()
     }
 

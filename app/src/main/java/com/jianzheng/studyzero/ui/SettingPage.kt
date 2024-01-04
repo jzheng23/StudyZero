@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,8 @@ val mediumPadding = 12.dp
 fun SettingPage(
     modifier: Modifier = Modifier
 ) {
-
+    val showDialog = remember { mutableStateOf(false) }
+    LoginPage(showDialog)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,9 +69,25 @@ fun SettingPage(
                 Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
                 ResetButton()
 //                TestFirebaseButton()
+                Text("Please login")
+                LoginButton(showDialog)
 
             }
         }
+    }
+
+}
+
+@Composable
+fun LoginButton(
+    showDialog: MutableState<Boolean>
+) {
+    Button(
+        onClick = {
+            showDialog.value = true
+        }
+    ){
+        Text("Login")
     }
 
 }
