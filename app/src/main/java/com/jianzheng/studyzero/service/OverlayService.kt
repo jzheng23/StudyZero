@@ -21,6 +21,7 @@ class OverlayService : Service() {
 
     private val windowManager get() = getSystemService(WINDOW_SERVICE) as WindowManager
     private var unlockTime: Long = 0
+    private var isShowing: Boolean = false
     private lateinit var composeView: ComposeView
     private lateinit var lifecycleOwner: MyLifecycleOwner
 
@@ -33,11 +34,14 @@ class OverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return if (intent != null) {
-            unlockTime = intent.getLongExtra("unlock", System.currentTimeMillis())
-            Log.d("delayTime","received: $unlockTime")
-            var tag = intent.getStringExtra("tag")
-            if (tag == null) tag = "randomMet"
-            callOverlay(tag)
+            if (!isShowing) {
+                unlockTime = intent.getLongExtra("unlock", System.currentTimeMillis())
+                Log.d("delayTime","received: $unlockTime")
+                var tag = intent.getStringExtra("tag")
+                if (tag == null) tag = "randomMet"
+                callOverlay(tag)
+                isShowing = true
+            }
             Log.d("unlock","OverlayService OnStartCommand with Intent: $intent")
             START_STICKY
         } else {
@@ -101,6 +105,7 @@ class OverlayService : Service() {
         super.onDestroy()
         lifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         if (composeView.isAttachedToWindow) windowManager.removeView(composeView)
+        isShowing = false
         Log.d("unlock","OverlayService OnDestroy")
     }
 

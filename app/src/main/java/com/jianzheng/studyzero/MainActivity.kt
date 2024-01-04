@@ -13,14 +13,13 @@ import com.jianzheng.studyzero.data.EsmDatabase
 import com.jianzheng.studyzero.data.Response
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.service.MyForegroundService
-import com.jianzheng.studyzero.tool.MyPermissionChecker
+import com.jianzheng.studyzero.tool.MyPermissionManager
 import com.jianzheng.studyzero.ui.SettingPage
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     private val unlockReceiver = UnlockReceiver()
@@ -39,8 +38,8 @@ class MainActivity : ComponentActivity() {
             }
         }
         //Check permissions
-        MyPermissionChecker.checkOverlayPermission(this)
-        MyPermissionChecker.checkNotificationPermission(this)
+//        MyPermissionManager.checkOverlayPermission(this)
+//        MyPermissionManager.checkNotificationPermission(this)
 
         //register receiver
         val filter = IntentFilter().apply {
@@ -52,13 +51,14 @@ class MainActivity : ComponentActivity() {
         val myForegroundServiceIntent = Intent(this, MyForegroundService::class.java)
         ContextCompat.startForegroundService(this, myForegroundServiceIntent)
 
-        //start room
+        //start room TODO maybe not needed?
         val db = Room.databaseBuilder(applicationContext, EsmDatabase::class.java,"response_database").build()
         val responseDao = db.responseDao()
         GlobalScope.launch(Dispatchers.IO) {
             responseDao.insert(Response(id = 1, delay = 0, answer1 = 9, answer2 = 9, startingTime = 0, submittingTime = 0))
         }
 
+        //init sharedPreference, TODO maybe not needed?
         val sharedPreferences =
             this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
         if (sharedPreferences.getBoolean("first_run", true)) createSharedPreference()

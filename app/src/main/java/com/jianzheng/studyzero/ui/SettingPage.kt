@@ -1,8 +1,7 @@
 package com.jianzheng.studyzero.ui
 
 import android.content.Context
-import android.content.Intent
-import android.util.Log
+import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,34 +11,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
-import com.jianzheng.studyzero.R
-import com.jianzheng.studyzero.service.OverlayService
-import com.jianzheng.studyzero.tool.MyDelayManager
-import com.jianzheng.studyzero.tool.ResponseCounter
-import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
+import androidx.core.app.NotificationManagerCompat
+import com.jianzheng.studyzero.tool.MyPermissionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 val mediumPadding = 12.dp
 
@@ -49,13 +42,12 @@ fun SettingPage(
     modifier: Modifier = Modifier
 ) {
     val showDialog = remember { mutableStateOf(false) }
-    val showLoginButton = remember { mutableStateOf(true) }
     val sharedPreferences =
         LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     val userId = remember {
         mutableStateOf(sharedPreferences.getString("UID", "null"))
     }
-    if (showDialog.value) LoginPage(userId,showDialog)
+    if (showDialog.value) LoginPage(userId, showDialog)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,194 +55,130 @@ fun SettingPage(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (showLoginButton.value and (userId.value == "null")) {
+        if (userId.value == "null") {
             Text("Please login")
             LoginButton(
-                showLoginButton = showLoginButton,
                 showDialog = showDialog
             )
+        } else {
+            PermissionSetting(userId)
         }
-        testingPage(
-            userId = userId,
-            modifier = modifier,
-            showLoginButton = showLoginButton,
-            showDialog = showDialog
-        )
+//        TestingPage(
+//            userId = userId,
+//            modifier = modifier,
+//            showDialog = showDialog
+//        )
     }
 
 }
+
 @Composable
-fun testingPage(
+fun PermissionSetting(
     userId: MutableState<String?>,
-    modifier: Modifier,
-    showLoginButton: MutableState<Boolean>,
-    showDialog: MutableState<Boolean>
+//    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier.padding(16.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = modifier
-                .padding(mediumPadding)
-        ) {
+        val context = LocalContext.current
+        val notificationAllowed by usePollState {
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        }
+        val overlayAllowed by usePollState { Settings.canDrawOverlays(context) }
+        val usageStatAllowed by usePollState {
+            MyPermissionManager.checkUserStatPermission(context)
+        }
+        if (notificationAllowed and overlayAllowed and usageStatAllowed) {
             Text(
-                text = "Only for testing",
+                text = "Welcome, ${userId.value}!",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Divider()
+            Text(
+                text = "App has been running for x day(s).",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "You have made:",
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text = "X report(s) today,",
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text = "X report(s) in total.",
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Divider()
+            Text(
+                    text = "Thanks for your input!",
+            style = MaterialTheme.typography.headlineSmall,
+            )
+        } else {
+            Text(
+                text = "Permission setting",
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
-            Text("User ID is ${userId.value}")
-            Text("Lock and then unlock your phone to see the floating window")
-            TestButton()
-            //ShowStatus()
-            //ShowOptions()
-            Text("The testing trigger list is short (3 random and 3 fixed). You can reset it after you have run out of the triggers.")
-            ResetButton()
-//                TestFirebaseButton()
-            Text("Change user ID")
-            LoginButton(
-                showLoginButton = showLoginButton,
-                showDialog = showDialog)
         }
+        if (!notificationAllowed) {
+            AuthCard(
+                title = "Notification",
+                desc = "Notifications keep the app alive.",
+                onAuthClick = {
+                    MyPermissionManager.grantNotificationPermission(context)
+                },
+            )
+            Divider()
+        }
+
+        if (!overlayAllowed) {
+            AuthCard(
+                title = "Overlay",
+                desc = "To show the survey without minimizing the current app.",
+                onAuthClick = {
+                    MyPermissionManager.grantOverlayPermission(context)
+                },
+            )
+            Divider()
+        }
+
+        if (!usageStatAllowed) {
+            AuthCard(
+                title = "App usage",
+                desc = "To access app usage history.",
+                onAuthClick = {
+                    MyPermissionManager.grantUserStatPermission(context)
+                },
+            )
+        }
+
     }
 }
 
+
 @Composable
 fun LoginButton(
-    showLoginButton: MutableState<Boolean>,
     showDialog: MutableState<Boolean>
 ) {
     Button(
         onClick = {
             showDialog.value = true
-            showLoginButton.value = false
         }
-    ){
+    ) {
         Text("Login")
     }
 }
 
-@Composable
-fun TestFirebaseButton() {
-    Button(
-        onClick = {
-            // Write a message to the database
-            val database = Firebase.database
-            val myRef = database.getReference("message")
-            myRef.setValue("Hello, World!")
-        }
-    ){
-        Text(
-            text = "Test Firebase",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
-fun ResetButton() {
-    val context = LocalContext.current
-    val responseCounter = ResponseCounter(context)
-    Button(
-        onClick = {
-            responseCounter.resetCounter()
-            MyDelayManager.resetTriggerList()
-        },
-    ) {
-        Text(
-            text = "Reset",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-    }
-}
-
-@Composable
-fun TestButton() {
-    val context = LocalContext.current
-    val serviceIntent = Intent(context, OverlayService::class.java).apply {
-        putExtra("tag", "testMet")
-    }
-    Button(
-        onClick = {
-            context.startService(serviceIntent)
-        },
-    ) {
-        Text(
-            text = "Test",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-    }
-}
-
-@Composable
-fun ShowStatus(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .padding(mediumPadding)
-    ) {
-        Text("prompts showed: x")
-        Text("prompts answered: y")
-    }
-}
-
-@Composable
-fun ShowOptions(
-    modifier: Modifier = Modifier
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-    )
-    {
-        Text("Data collection in progress ")
-        Spacer(modifier = Modifier.weight(0.1f))
-        SwitchMinimalExample()
-    }
-}
-
-
-@Composable
-fun SwitchMinimalExample() {
-    var checked by remember { mutableStateOf(true) }
-
-    Switch(
-        checked = checked,
-        onCheckedChange = {
-            checked = it
-            if (checked) {
-                Log.d("Setting", "Data collection ON")
-                //context.registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
-            } else {
-                Log.d("Setting", "Data collection OFF")
-                //context.unregisterReceiver(unlockReceiver)
-            }
-        }
-    )
-}
-
-@Preview
-@Composable
-fun PreviewSetting() {
-    StudyZeroTheme {
-        // A surface container using the 'background' color from the theme
-        Surface {
-            SettingPage()
-        }
-    }
-}
 
 @Composable
 fun AuthCard(
     title: String,
     desc: String,
     onAuthClick: () -> Unit,
+    buttonText: String = "Allow"
 ) {
     Row(
         modifier = Modifier.padding(10.dp, 5.dp), verticalAlignment = Alignment.CenterVertically
@@ -265,8 +193,26 @@ fun AuthCard(
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
-        OutlinedButton(onClick = onAuthClick) {
-            Text(text = "授权")
+        Button(onClick = onAuthClick) {
+            Text(text = buttonText)
         }
     }
+}
+
+@Composable
+fun <T> usePollState(
+    context: CoroutineContext = Dispatchers.Default,
+    interval: Long = 1000L,
+    getter: () -> T,
+): MutableState<T> {
+    val mutableState = remember { mutableStateOf(getter()) }
+    LaunchedEffect(Unit) {
+        withContext(context) {
+            while (isActive) {
+                delay(interval)
+                mutableState.value = getter()
+            }
+        }
+    }
+    return mutableState
 }
