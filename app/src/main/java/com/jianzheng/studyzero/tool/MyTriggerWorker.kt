@@ -7,7 +7,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.jianzheng.studyzero.service.OverlayService
 
-class MyWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
+class MyTriggerWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     //    val inputData = params.inputData
     override fun doWork(): Result {
         val tag = inputData.getString("tag")

@@ -8,39 +8,31 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import androidx.core.content.ContextCompat
-import androidx.room.Room
-import com.jianzheng.studyzero.data.EsmDatabase
-import com.jianzheng.studyzero.data.Response
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.jianzheng.studyzero.receiver.UnlockReceiver
 import com.jianzheng.studyzero.service.MyForegroundService
+import com.jianzheng.studyzero.tool.MyDailyWorker
 import com.jianzheng.studyzero.tool.MyDelayManager
-import com.jianzheng.studyzero.tool.MyPermissionManager
 import com.jianzheng.studyzero.ui.SettingPage
 import com.jianzheng.studyzero.ui.theme.StudyZeroTheme
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     private val unlockReceiver = UnlockReceiver()
-    @OptIn(DelicateCoroutinesApi::class)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Log.d("Main", "OnCreate")
 
         setContent {
             StudyZeroTheme {
-                // A surface container using the 'background' color from the theme
                 Surface {
                     SettingPage()
-                    //ShowOverlayAlt()
                 }
             }
         }
-        //Check permissions
-//        MyPermissionManager.checkOverlayPermission(this)
-//        MyPermissionManager.checkNotificationPermission(this)
 
         //register receiver
         val filter = IntentFilter().apply {
@@ -65,6 +57,35 @@ class MainActivity : ComponentActivity() {
         if (sharedPreferences.getBoolean("first_run", true)) createSharedPreference()
 
         MyDelayManager.init(this)
+        scheduleDailyMaintenance()
+    }
+
+    private fun scheduleDailyMaintenance() {
+        val workRequest = PeriodicWorkRequestBuilder<MyDailyWorker>(24, TimeUnit.HOURS)
+            // Additional configuration (like constraints)
+            .setInitialDelay(getInitialDelay(), TimeUnit.MILLISECONDS)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "daily_maintenance",
+            ExistingPeriodicWorkPolicy.KEEP, // KEEP or REPLACE
+            workRequest
+        )
+    }
+
+    private fun getInitialDelay(): Long {
+        val currentDate = Calendar.getInstance()
+        val dueDate = Calendar.getInstance().apply {
+            // Set time to 4 AM
+            set(Calendar.HOUR_OF_DAY, 4)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            // If it's after or equal 4 AM, schedule for the next day
+            if (before(currentDate)) {
+                add(Calendar.HOUR_OF_DAY, 24)
+            }
+        }
+        return dueDate.timeInMillis - currentDate.timeInMillis
     }
 
     private fun createSharedPreference() {
@@ -74,8 +95,7 @@ class MainActivity : ComponentActivity() {
         val editor = sharedPreferences.edit()
 
         // Put values
-        editor.putString("example_key", "Hello, SharedPreferences!")
-            .putBoolean("first_run",false)
+        editor.putBoolean("first_run", false)
             .putString("UID", "null")
             .apply()
     }

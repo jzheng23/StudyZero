@@ -51,7 +51,7 @@ object MyDelayManager {
         val currentTimeMillis = System.currentTimeMillis()
         Log.d("delayTime","passed in myDelayManager: $currentTimeMillis")
         if (!responseCounter.checkRandomComplete()) {
-            val triggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
+            val triggerRequest = OneTimeWorkRequestBuilder<MyTriggerWorker>()
                 .setInitialDelay(triggerList[triggerIndex].toLong(), TimeUnit.SECONDS)
                 .setInputData(workDataOf("tag" to context.getString(R.string.random_met), "unlock" to currentTimeMillis))
                 .build()
@@ -64,7 +64,7 @@ object MyDelayManager {
             triggerIndex++
         }
         if (!responseCounter.check20Complete()) {
-            val twentyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
+            val twentyTriggerRequest = OneTimeWorkRequestBuilder<MyTriggerWorker>()
 //                .setInitialDelay(extraTriggerTwenty, TimeUnit.MINUTES)
                 .setInitialDelay(extraTriggerTwenty, TimeUnit.SECONDS)
                 .setInputData(workDataOf("tag" to context.getString(R.string._20met),"unlock" to currentTimeMillis))
@@ -73,7 +73,7 @@ object MyDelayManager {
             twentyRequestID = twentyTriggerRequest.id
             Log.d("unlock", "a fixed trigger is scheduled in 20 sec ")
         } else if (!responseCounter.check30Complete()) {
-            val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyWorker>()
+            val thirtyTriggerRequest = OneTimeWorkRequestBuilder<MyTriggerWorker>()
 //                .setInitialDelay(extraTriggerThirty, TimeUnit.MINUTES)
                 .setInitialDelay(extraTriggerThirty, TimeUnit.SECONDS)
                 .setInputData(workDataOf("tag" to context.getString(R.string._30met), "unlock" to currentTimeMillis))

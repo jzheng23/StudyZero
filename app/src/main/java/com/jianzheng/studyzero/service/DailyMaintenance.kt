@@ -7,9 +7,15 @@ import com.jianzheng.studyzero.tool.MyDelayManager
 import com.jianzheng.studyzero.tool.ResponseCounter
 
 class DailyMaintenance : Service() {
-    fun uploadData() {}
 
-    fun resetTriggerList() {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        uploadData()
+        resetTriggerList()
+        return START_STICKY
+    }
+    private fun uploadData() {}
+
+    private fun resetTriggerList() {
         val responseCounter = ResponseCounter(this)
         responseCounter.resetCounter()
         MyDelayManager.resetTriggerList()
